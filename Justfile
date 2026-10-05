@@ -169,7 +169,7 @@ test: test-backend test-frontend
 
 # Run the pytest suite.
 test-backend:
-    {{uv}} run pytest
+    cd {{backend}} && uv run pytest
 
 # Run the Vitest suite once.
 test-frontend:
@@ -181,7 +181,7 @@ test-watch:
 
 # Backend tests with a coverage report.
 coverage:
-    {{uv}} run pytest --cov=app --cov-report=term-missing
+    cd {{backend}} && uv run pytest --cov=app --cov-report=term-missing
 
 # Lint everything.
 lint: lint-backend lint-frontend
