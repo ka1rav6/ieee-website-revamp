@@ -1,0 +1,49 @@
+# Overlay that adds the application container, so the whole stack runs the
+# same way it does in production:
+#
+#   browser -> app container (FastAPI serves the built React bundle) -> postgres
+#
+# Used by `just run` and `just docker-run`. Compose with the base file:
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up
+
+services:
+  app:
+    image: ieee-iiitd-website:local
+    build:
+      context: .
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ENVIRONMENT: ${ENVIRONMENT:-production}
+      SITE_URL: ${SITE_URL:-http://localhost:8000}
+      SECRET_KEY: ${SECRET_KEY:?SECRET_KEY must be set}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-720}
+      CORS_ORIGINS: ${CORS_ORIGINS:-}
+      # Inside the compose network Postgres is reachable by service name.
+      POSTGRES_USER: ${POSTGRES_USER:-ieee}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ieee-local-dev-password}
+      POSTGRES_DB: ${POSTGRES_DB:-ieee}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-ieee@iiitd.ac.in}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      UPLOAD_DIR: /data/uploads
+      MAX_UPLOAD_SIZE_MB: ${MAX_UPLOAD_SIZE_MB:-5}
+      EMAIL_BACKEND: ${EMAIL_BACKEND:-console}
+      EMAIL_FROM: ${EMAIL_FROM:-ieee@iiitd.ac.in}
+      EMAIL_TO: ${EMAIL_TO:-}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USERNAME: ${SMTP_USERNAME:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_USE_TLS: ${SMTP_USE_TLS:-true}
+    ports:
+      - "8000:8000"
+    volumes:
+      # Admin-uploaded images must outlive the container.
+      - uploads:/data/uploads
+
+volumes:
+  uploads:
