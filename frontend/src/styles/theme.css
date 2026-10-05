@@ -1,0 +1,193 @@
+/* =========================================================================
+   IEEE IIIT Delhi - design tokens
+   =========================================================================
+   The palette is built from IEEE's brand blue (#00629B) but deliberately
+   does not stop there: a bright azure carries interaction, and a warm amber
+   carries emphasis. Blue alone would read as corporate and flat, and would
+   leave nothing to draw the eye to what matters on a page.
+
+   Every colour is defined on bare :root so a value always exists. The dark
+   theme redefines only the tokens that change, under both a media query
+   (system preference) and an attribute selector (explicit choice), so the
+   toggle wins in both directions.
+   ========================================================================= */
+
+@theme {
+  /* --- Brand ---------------------------------------------------------- */
+  --color-ieee-50: #eaf4fb;
+  --color-ieee-100: #cfe6f5;
+  --color-ieee-200: #a3cfeb;
+  --color-ieee-300: #6bb2dd;
+  --color-ieee-400: #2f90ca;
+  --color-ieee-500: #0f7ab8;
+  --color-ieee-600: #00629b; /* IEEE brand blue */
+  --color-ieee-700: #014e7c;
+  --color-ieee-800: #053d61;
+  --color-ieee-900: #082f4b;
+  --color-ieee-950: #04121f;
+
+  /* Azure: interaction, links, focus. Brighter than brand blue so it reads
+     clearly against the dark ground. */
+  --color-azure-300: #7ad7ff;
+  --color-azure-400: #38c2fb;
+  --color-azure-500: #0ea5e9;
+  --color-azure-600: #0284c7;
+
+  /* Amber: emphasis and counters. The one warm note, used sparingly. */
+  --color-ember-300: #ffd27a;
+  --color-ember-400: #ffb627;
+  --color-ember-500: #f59300;
+  --color-ember-600: #c26f00;
+
+  /* Signal green and crimson, for status only - never as decoration. */
+  --color-signal-400: #34d399;
+  --color-signal-600: #059669;
+  --color-crimson-400: #fb7185;
+  --color-crimson-600: #be123c;
+
+  /* --- Typography ----------------------------------------------------- */
+  --font-display:
+    'Bricolage Grotesque Variable', 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Inter Variable', 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono:
+    'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+  /* --- Motion --------------------------------------------------------- */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.26, 0.64, 1);
+
+  /* --- Layout --------------------------------------------------------- */
+  --spacing-gutter: 1.5rem;
+}
+
+:root {
+  color-scheme: light;
+
+  /* Surfaces, from the page backdrop inward. Three levels is enough to
+     express depth without the stack becoming muddy. */
+  --surface-base: #f6f8fb;
+  --surface-raised: #ffffff;
+  --surface-sunken: #eceff4;
+  --surface-inverted: #04121f;
+
+  /* Text, in descending prominence. */
+  --text-strong: #06131f;
+  --text-default: #1d2d3d;
+  --text-muted: #566675;
+  --text-faint: #8695a3;
+  --text-on-brand: #ffffff;
+
+  --border-subtle: #dde3ea;
+  --border-default: #c7d1db;
+  --border-strong: #9eabb8;
+
+  --brand: var(--color-ieee-600);
+  --brand-strong: var(--color-ieee-700);
+  --accent: var(--color-azure-600);
+  --accent-soft: var(--color-azure-300);
+  --emphasis: var(--color-ember-500);
+
+  /* The hero's glow and grid, kept as tokens so both themes stay coherent. */
+  --glow-primary: color-mix(in oklab, var(--color-ieee-500) 22%, transparent);
+  --glow-secondary: color-mix(in oklab, var(--color-ember-400) 12%, transparent);
+  --grid-line: color-mix(in oklab, var(--color-ieee-900) 7%, transparent);
+
+  --shadow-card: 0 1px 2px rgb(6 19 31 / 0.06), 0 8px 24px -12px rgb(6 19 31 / 0.14);
+  --shadow-lifted: 0 2px 4px rgb(6 19 31 / 0.08), 0 24px 48px -20px rgb(6 19 31 / 0.22);
+
+  --radius-card: 14px;
+  --header-height: 4.5rem;
+}
+
+/* Dark theme. Applied by system preference unless the visitor has explicitly
+   chosen light, and by the data attribute when they have chosen dark. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+
+    --surface-base: #060d15;
+    --surface-raised: #0c1823;
+    --surface-sunken: #040a11;
+    --surface-inverted: #f6f8fb;
+
+    --text-strong: #f3f7fa;
+    --text-default: #cfdae4;
+    --text-muted: #8fa2b3;
+    --text-faint: #64788a;
+    --text-on-brand: #ffffff;
+
+    --border-subtle: #16262f;
+    --border-default: #22394a;
+    --border-strong: #345166;
+
+    --brand: var(--color-ieee-400);
+    --brand-strong: var(--color-ieee-300);
+    --accent: var(--color-azure-400);
+    --accent-soft: var(--color-azure-300);
+    --emphasis: var(--color-ember-400);
+
+    --glow-primary: color-mix(in oklab, var(--color-azure-500) 26%, transparent);
+    --glow-secondary: color-mix(in oklab, var(--color-ember-500) 14%, transparent);
+    --grid-line: color-mix(in oklab, var(--color-azure-300) 9%, transparent);
+
+    --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px -12px rgb(0 0 0 / 0.6);
+    --shadow-lifted: 0 2px 4px rgb(0 0 0 / 0.5), 0 24px 48px -20px rgb(0 0 0 / 0.75);
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --surface-base: #060d15;
+  --surface-raised: #0c1823;
+  --surface-sunken: #040a11;
+  --surface-inverted: #f6f8fb;
+
+  --text-strong: #f3f7fa;
+  --text-default: #cfdae4;
+  --text-muted: #8fa2b3;
+  --text-faint: #64788a;
+  --text-on-brand: #ffffff;
+
+  --border-subtle: #16262f;
+  --border-default: #22394a;
+  --border-strong: #345166;
+
+  --brand: var(--color-ieee-400);
+  --brand-strong: var(--color-ieee-300);
+  --accent: var(--color-azure-400);
+  --accent-soft: var(--color-azure-300);
+  --emphasis: var(--color-ember-400);
+
+  --glow-primary: color-mix(in oklab, var(--color-azure-500) 26%, transparent);
+  --glow-secondary: color-mix(in oklab, var(--color-ember-500) 14%, transparent);
+  --grid-line: color-mix(in oklab, var(--color-azure-300) 9%, transparent);
+
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px -12px rgb(0 0 0 / 0.6);
+  --shadow-lifted: 0 2px 4px rgb(0 0 0 / 0.5), 0 24px 48px -20px rgb(0 0 0 / 0.75);
+}
+
+/* Expose the semantic tokens to Tailwind utilities, so `bg-surface-raised`
+   and `text-muted` work alongside the brand scales. */
+@theme inline {
+  --color-surface-base: var(--surface-base);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-surface-inverted: var(--surface-inverted);
+
+  --color-strong: var(--text-strong);
+  --color-default: var(--text-default);
+  --color-muted: var(--text-muted);
+  --color-faint: var(--text-faint);
+  --color-on-brand: var(--text-on-brand);
+
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-emphasis: var(--emphasis);
+
+  --color-subtle: var(--border-subtle);
+  --color-line: var(--border-default);
+  --color-line-strong: var(--border-strong);
+}
