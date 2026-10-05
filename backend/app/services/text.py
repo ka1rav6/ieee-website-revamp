@@ -9,6 +9,10 @@ import bleach
 from markdown_it import MarkdownIt
 
 _SLUG_STRIP = re.compile(r"[^a-z0-9]+")
+# Matched before sanitising so that script/style *contents* are dropped too.
+# bleach's allow-list removes the tags but keeps their text, which would
+# otherwise render a blocked script's source as article prose.
+_EXECUTABLE_BLOCK = re.compile(r"<(script|style|iframe|object|embed)\b.*?</\1\s*>", re.S | re.I)
 _WORD = re.compile(r"\w+")
 
 # Words per minute used for the "N min read" label.
@@ -100,7 +104,7 @@ def render_markdown(body: str) -> str:
     inject into the page: raw HTML in the source passes through the renderer
     but cannot survive the allow-list.
     """
-    html = _markdown.render(body or "")
+    html = _EXECUTABLE_BLOCK.sub("", _markdown.render(body or ""))
     cleaned = bleach.clean(
         html,
         tags=ALLOWED_TAGS,
