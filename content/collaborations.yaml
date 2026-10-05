@@ -1,0 +1,121 @@
+# Industry collaborations. List order is display order.
+#
+# Each entry's `description` says what the organisation is. Add
+# `collaboration_type` and `year` to record how and when the branch worked
+# with them - the previous website never captured this, so those fields start
+# out commented.
+#
+# Run `just content-import` after editing.
+
+- name: "Nasa JPL"
+  slug: "nasa-jpl"
+  logo: "/legacy/sponsors/nasa-jpl.png"
+  website_url: "https://www.jpl.nasa.gov/"
+  description: "NASA's Jet Propulsion Laboratory, the centre behind the agency's robotic planetary missions."
+  # collaboration_type: Sponsor | Workshop partner | Speaker | Prize partner
+  # year: 2024
+- name: "Solana"
+  slug: "solana"
+  logo: "/legacy/sponsors/solana.svg"
+  website_url: "https://solana.com/"
+  description: "A high-throughput public blockchain and its developer ecosystem."
+  # collaboration_type: Sponsor | Workshop partner | Speaker | Prize partner
+  # year: 2024
+- name: "NordVPN"
+  slug: "nordvpn"
+  logo: "/legacy/sponsors/nordvpn.png"
+  website_url: "https://nordvpn.com/"
+  description: "A consumer privacy and VPN provider."
+  # collaboration_type: Sponsor | Workshop partner | Speaker | Prize partner
+  # year: 2024
+- name: "Nescafe"
+  slug: "nescafe"
+  logo: "/legacy/sponsors/nescafe.png"
+  website_url: "https://www.nescafe.com/in/"
+  description: "Nestle's coffee brand, a long-running supporter of campus events."
+  # collaboration_type: Sponsor | Workshop partner | Speaker | Prize partner
+  # year: 2024
+- name: "Wolfram"
+  slug: "wolfram"
+  logo: "/legacy/sponsors/wolfram.png"
+  website_url: "https://wolfram.com/"
+  description: "Makers of Mathematica and the Wolfram Language, widely used in technical computing."
+  # collaboration_type: Sponsor | Workshop partner | Speaker | Prize partner
+  # year: 2024
+- name: "Matic"
+  slug: "matic"
+  logo: "/legacy/sponsors/matic.png"
+  website_url: "https://matic.network/"
+  description: "The scaling network for Ethereum now known as Polygon."
+  # collaboration_type: Sponsor | Workshop partner | Speaker | Prize partner
+  # year: 2024
+- name: "Coinswitch Kuber"
+  slug: "coinswitch-kuber"
+  logo: "/legacy/sponsors/coinswitch-kuber-all-white.png"
+  website_url: "https://coinswitch.co/in"
+  description: "An Indian cryptocurrency investing platform."
+  # collaboration_type: Sponsor | Workshop partner | Speaker | Prize partner
+  # year: 2024
+- name: "echoAR"
+  slug: "echoar"
+  logo: "/legacy/sponsors/echo-ar.png"
+  website_url: "https://www.echoar.xyz"
+  description: "Cloud infrastructure for augmented and virtual reality applications."
+  # collaboration_type: Sponsor | Workshop partner | Speaker | Prize partner
+  # year: 2024
+- name: "Axure"
+  slug: "axure"
+  logo: "/legacy/sponsors/axure.png"
+  website_url: "https://www.axure.com/"
+  description: "Prototyping and design-specification tooling for product teams."
+  # collaboration_type: Sponsor | Workshop partner | Speaker | Prize partner
+  # year: 2024
+- name: "Devfolio"
+  slug: "devfolio"
+  logo: "/legacy/sponsors/devfolio.png"
+  website_url: "https://devfolio.co"
+  description: "India's largest hackathon platform."
+  # collaboration_type: Sponsor | Workshop partner | Speaker | Prize partner
+  # year: 2024
+- name: "Repl.it"
+  slug: "repl-it"
+  logo: "/legacy/sponsors/repl-it.png"
+  website_url: "https://repl.it"
+  description: "A browser-based collaborative development environment."
+  # collaboration_type: Sponsor | Workshop partner | Speaker | Prize partner
+  # year: 2024
+- name: "Coding Blocks"
+  slug: "coding-blocks"
+  logo: "/legacy/sponsors/coding-blocks.png"
+  website_url: "https://codingblocks.com/"
+  description: "A programming education company running bootcamps and courses."
+  # collaboration_type: Sponsor | Workshop partner | Speaker | Prize partner
+  # year: 2024
+- name: "Lumos Labs"
+  slug: "lumos-labs"
+  logo: "/legacy/sponsors/lumoslabs.png"
+  website_url: "https://www.lumoslabs.co"
+  description: "An innovation firm building developer and Web3 ecosystems in India."
+  # collaboration_type: Sponsor | Workshop partner | Speaker | Prize partner
+  # year: 2024
+- name: "Taskade"
+  slug: "taskade"
+  logo: "/legacy/sponsors/taskade.png"
+  website_url: "https://www.taskade.com/"
+  description: "A collaborative task management and team productivity tool."
+  # collaboration_type: Sponsor | Workshop partner | Speaker | Prize partner
+  # year: 2024
+- name: "Fold"
+  slug: "fold"
+  logo: "/legacy/sponsors/fold.png"
+  website_url: "https://fold.money"
+  description: "A fintech product for managing money and spending."
+  # collaboration_type: Sponsor | Workshop partner | Speaker | Prize partner
+  # year: 2024
+- name: "Portis by ShapeShift"
+  slug: "portis-by-shapeshift"
+  logo: "/legacy/sponsors/portis.png"
+  website_url: "https://www.portis.io/"
+  description: "A wallet-as-a-service for blockchain applications."
+  # collaboration_type: Sponsor | Workshop partner | Speaker | Prize partner
+  # year: 2024

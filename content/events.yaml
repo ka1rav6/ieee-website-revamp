@@ -1,0 +1,222 @@
+# Events, newest first. Dates are YYYY-MM-DD.
+# Set `is_featured: true` to surface an event on the landing page.
+# Set `ieee_day_year: 2025` to attach an event to an IEEE Day edition.
+
+- title: "From Sand to Chip: The Journey of Semiconductor and Chip Manufacturing"
+  slug: "from-sand-to-chip-the-journey-of-semiconductor-and-chip-manufacturing"
+  date: 2026-03-27
+  description: "Seminar by Dr Ashwini K. Aggarwal on India's semiconductor ecosystem, innovation trends, and opportunities in semiconductor packaging."
+  poster: "/legacy/events/sand-to-sillicon-2026.webp"
+  is_featured: true
+- title: "Slash"
+  slug: "slash"
+  date: 2026-03-13
+  description: "Slash Hunt is a cryptic tech hunt in a 4-hour or 2-day format combining ciphers, software-based problem solving, and beginner-friendly competitive challenges."
+  poster: "/legacy/events/slash-2026.webp"
+  is_featured: true
+- title: "IEEE Identity Quest 2026"
+  slug: "ieee-identity-quest-2026"
+  date: 2026-02-15
+  description: "A multi-phase challenge to design a Student Branch visual identity alongside IEEE Master Brand rules. Judging emphasizes compliance, originality, and practical usability. Prize money: INR 4,000."
+  poster: "/legacy/events/identity-quest-2026.webp"
+  is_featured: true
+- title: "Indian Semiconductor Landscape & Packaging"
+  slug: "indian-semiconductor-landscape-packaging"
+  date: 2026-02-13
+  description: "Talk on India's semiconductor ecosystem, innovation trends, and opportunities in semiconductor packaging."
+  poster: "/legacy/events/kickstarting-non-stop-innovation-2025.webp"
+- title: "CTF With NodeZero"
+  slug: "ctf-with-nodezero"
+  date: 2026-01-25
+  description: "A 3-hour workshop in collaboration with NodeZer0 featuring cybersecurity fundamentals, hands-on exercises, and an introductory CTF to build ethical hacking and problem-solving skills."
+  poster: "/legacy/events/nodezero-2026.webp"
+- title: "Inauguration session by Ramneek sir, IEEE Delhi Section"
+  slug: "inauguration-session-by-ramneek-sir-ieee-delhi-section"
+  date: 2025-09-03
+  description: "Inauguration session by Ramneek Kalra from IEEE Delhi Section."
+  poster: "/legacy/events/ramneek-sir-2025.webp"
+- title: "IEEE X E-CELL Web Dev Workshop"
+  slug: "ieee-x-e-cell-web-dev-workshop"
+  date: 2025-08-13
+  description: "Workshop on web development conducted in collaboration with E-CELL."
+  poster: "/legacy/events/beyond-the-blueprint-2025.webp"
+- title: "Autorush"
+  slug: "autorush"
+  date: 2025-08-08
+  description: "Participants are introduced to rules, constraints, sample games, and hardware approaches such as Arduino keyboard emulation or Raspberry Pi vision bots."
+  poster: "/legacy/events/autorush-2025.webp"
+- title: "Typothon"
+  slug: "typothon"
+  date: 2025-08-08
+  description: "A typing speed competition for IIITD students across three levels, ending in a final duel among top performers."
+  poster: "/legacy/events/typothon-2025.webp"
+- title: "BYOL"
+  slug: "byol"
+  date: 2025-08-07
+  description: "Workshop on setting up an affordable mini electronics lab at home using basic components. Includes a guided build of a DIY oscilloscope."
+  poster: "/legacy/events/byol-2025.webp"
+- title: "IEEE: Induction Intro"
+  slug: "ieee-induction-intro"
+  date: 2025-08-05
+  description: "Introduction and induction session for new IEEE members."
+  poster: "/legacy/events/ieee-induction-intro-2025.webp"
+- title: "WIE: STEM Workshop for School Students"
+  slug: "wie-stem-workshop-for-school-students"
+  date: 2025-03-24
+  description: "WIE organized a STEM workshop for school students to promote women in engineering."
+  poster: "/legacy/events/wie-stem-workshop-for-school-students-2025.webp"
+- title: "TechCrisis Challenge"
+  slug: "techcrisis-challenge"
+  date: 2025-03-22
+  description: "A technology-focused crisis management challenge for participants."
+  poster: "/legacy/events/techcrisis-2025.webp"
+- title: "Hackathon: Infronix"
+  slug: "hackathon-infronix"
+  date: 2025-02-16
+  description: "A hardware-focused hackathon combining innovation and technical skills."
+  poster: "/legacy/events/infronix-2025.webp"
+- title: "Bachmanity Insanity 2.0"
+  slug: "bachmanity-insanity-2-0"
+  date: 2025-01-23
+  description: "The second edition of IIITD's legendary coding and trivia competition."
+  poster: "/legacy/events/bachmanity-insanity-2025.webp"
+- title: "IEEE: Inauguration 2025"
+  slug: "ieee-inauguration-2025"
+  date: 2024-11-05
+  description: "Annual inauguration ceremony for IEEE IIITD Student Branch."
+  poster: "/legacy/events/ieee-inaugration-2024.webp"
+- title: "Introduction to CTFs"
+  slug: "introduction-to-ctfs"
+  date: 2023-10-16
+  description: "Workshop introducing Capture The Flag cybersecurity competitions."
+  poster: "/legacy/events/introduction-to-ctfs-2023.webp"
+- title: "Machine Learning Battle"
+  slug: "machine-learning-battle"
+  date: 2023-10-14
+  description: "A competition focused on machine learning challenges."
+  poster: "/legacy/events/machine-learning-battle-2023.webp"
+- title: "1v1 Coding Lockout"
+  slug: "1v1-coding-lockout"
+  date: 2023-10-14
+  description: "Head-to-head competitive coding tournament."
+  poster: "/legacy/events/1v1-coding-lockout-2023.webp"
+- title: "Hardware and Robotics 101 Workshop"
+  slug: "hardware-and-robotics-101-workshop"
+  date: 2023-10-14
+  description: "Introductory workshop on hardware and robotics fundamentals."
+  poster: "/legacy/events/hardware-and-robotics-101-2023.webp"
+- title: "Mini Robowars"
+  slug: "mini-robowars"
+  date: 2023-10-14
+  description: "Competitive robotics event featuring mini battle bots."
+  poster: "/legacy/events/mini-robowars-2023.webp"
+- title: "EMPowher"
+  slug: "empowher"
+  date: 2023-10-14
+  description: "WIE event empowering women in engineering and technology."
+  poster: "/legacy/events/impowher-2023.webp"
+- title: "Quack"
+  slug: "quack"
+  date: 2023-08-25
+  description: "A fun coding competition with unique challenges."
+  poster: "/legacy/events/quack-2023.webp"
+- title: "XGrid"
+  slug: "xgrid"
+  date: 2023-08-25
+  description: "Grid-based competitive coding event."
+  poster: "/legacy/events/xgrid-2023.webp"
+- title: "HuntIT"
+  slug: "huntit"
+  date: 2023-08-24
+  description: "A tech-themed treasure hunt combining puzzles and technology."
+  poster: "/legacy/events/huntit-2023.webp"
+- title: "WIE Unlock Success Session"
+  slug: "wie-unlock-success-session"
+  date: 2023-07-11
+  description: "WIE session on unlocking success in engineering careers."
+  poster: "/legacy/events/wie-unlock-success-session-2023.webp"
+- title: "Hack:did"
+  slug: "hack-did"
+  date: 2023-07-01
+  description: "A creative hackathon focused on innovative solutions."
+  poster: "/legacy/events/hackdid-2023.webp"
+- title: "Enigma"
+  slug: "enigma"
+  date: 2023-04-22
+  description: "An enigmatic coding and logic challenge event."
+  poster: "/legacy/events/enigma-2023.webp"
+- title: "Slash"
+  slug: "slash-2023"
+  date: 2023-04-19
+  description: "A cryptic tech hunt combining ciphers and software challenges."
+  poster: "/legacy/events/slash-2023.webp"
+- title: "Puzzle Day"
+  slug: "puzzle-day"
+  date: 2023-03-21
+  description: "A day dedicated to puzzles and brain teasers for all participants."
+  poster: "/legacy/events/puzzle-day-2023.webp"
+- title: "HackDay Hackathon"
+  slug: "hackday-hackathon"
+  date: 2022-11-19
+  description: "24-hour hackathon focused on innovation."
+  poster: "/legacy/events/hackday-2022.webp"
+- title: "Xgrid"
+  slug: "xgrid-2022"
+  date: 2022-11-04
+  description: "Grid-based competitive coding event."
+  poster: "/legacy/events/xgrid-2022.webp"
+- title: "Not a Halloween Heist"
+  slug: "not-a-halloween-heist"
+  date: 2022-09-07
+  description: "Spooky-themed technical challenge event."
+  poster: "/legacy/events/not-a-halloween-heist-2022.webp"
+- title: "back slash"
+  slug: "back-slash"
+  date: 2022-06-28
+  description: "A bewildering and befuddling ride of mysteries, enigmas, and conundrums. Are you ready?"
+  poster: "/legacyhttps://cdn.sanity.io/images/zakv95rn/production/92e7ea3b29e74182374a9c0c934ac7e9bacb7d82-2157x1294.png"
+- title: "Code Acrostic"
+  slug: "code-acrostic"
+  date: 2022-06-01
+  description: "Coding event with acrostic-themed challenges."
+  poster: "/legacy/events/code-acoustic-2022.webp"
+- title: "Bachmanity Insanity"
+  slug: "bachmanity-insanity"
+  date: 2022-05-30
+  description: "Be it the hype over Web3.0 or be it Elon Musk & Twitter affair. Test out if you know what’s happening around you by participating in our flagship quiz."
+  poster: "/legacyhttps://cdn.sanity.io/images/zakv95rn/production/79fff72a38b5cf69573abd26b196a407316c7b7d-1950x1170.png"
+- title: "Switch the Pitch"
+  slug: "switch-the-pitch"
+  date: 2022-04-27
+  description: "Show up with wacky ideas that make people go, “Damn, why did I never think of this!?” It's the quirkiest event ever. Trust us!"
+  poster: "/legacyhttps://cdn.sanity.io/images/zakv95rn/production/516c3b5d5baa5c0125158a66c43a2ccbbe5c6955-500x300.png"
+- title: "slash - the cryptic hunt"
+  slug: "slash-the-cryptic-hunt"
+  date: 2022-01-24
+  description: "Wander through all corners of the internet as we test your logical skills in this 24-hour ordeal."
+  poster: "/legacyhttps://cdn.sanity.io/images/zakv95rn/production/cb95a234582910af66f964ebf654af5e3a00e3b6-750x451.png"
+- title: "Slash"
+  slug: "slash-2022"
+  date: 2022-01-24
+  description: "A cryptic tech hunt combining ciphers and software challenges."
+  poster: "/legacy/events/slash-2022.webp"
+- title: "Xgrid"
+  slug: "xgrid-2021"
+  date: 2021-11-12
+  description: "Grid-based competitive coding event."
+  poster: "/legacy/events/xgrid-2021.webp"
+- title: "TechTalks"
+  slug: "techtalks"
+  date: 2021-08-18
+  description: "Technical talks and discussions on emerging technologies."
+  poster: "/legacy/events/tech-talks-2021.webp"
+- title: "Workshop on Web Dev Using React"
+  slug: "workshop-on-web-dev-using-react"
+  date: 2021-06-12
+  description: "Hands-on workshop on web development using React."
+  poster: "/legacy/events/webdev-using-react-2021.webp"
+- title: "Slash"
+  slug: "slash-2021"
+  date: 2021-03-16
+  description: "A cryptic tech hunt combining ciphers and software challenges."
+  poster: "/legacy/events/slash-2021.webp"

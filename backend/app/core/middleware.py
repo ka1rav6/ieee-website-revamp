@@ -13,8 +13,9 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import Response
 
-# Historic blog covers and author photos are still served from Sanity's CDN.
-IMAGE_SOURCES = "'self' data: blob: https://cdn.sanity.io https://ieee.iiitd.edu.in"
+# Every image, including the content imported from the previous site, is
+# served from this origin, so no external image host needs allowing.
+IMAGE_SOURCES = "'self' data: blob:"
 
 CONTENT_SECURITY_POLICY = "; ".join(
     [

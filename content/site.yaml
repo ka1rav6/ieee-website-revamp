@@ -1,0 +1,78 @@
+# Editable site copy and links.
+#
+# Every value here is also editable in the admin dashboard under Settings,
+# so routine wording changes never need a developer.
+# After editing this file, run `just content-import`.
+
+# --- Identity -------------------------------------------------------------
+site_name: "IEEE IIIT Delhi"
+site_tagline: "Student Branch"
+hero_heading: "Technology for humanity, built by students."
+hero_subheading: >-
+  The IEEE student branch at IIIT Delhi, where the institute's biggest
+  technical events are imagined, engineered and run.
+hero_eyebrow: "In affiliation with IEEE, WIE and Computer Society"
+
+# --- About ----------------------------------------------------------------
+about_short: >-
+  IEEE-IIITD is the student branch of the world's largest technical
+  professional organisation dedicated to advancing technology to benefit
+  humanity.
+about_body: |
+  IEEE-IIITD is the student branch of the world's largest technical
+  professional organisation dedicated to advancing technology to benefit
+  humanity. At IEEE-IIITD, student branch members get a chance to explore
+  their interests by organising the biggest events of the institute alongside
+  the most capable and creatively and technically driven students.
+
+  The membership gives students networking opportunities to meet and learn
+  from fellow IEEE Student and Graduate Student Members, and to engage with
+  professional IEEE members.
+
+  We are driven to provide the student body with access to technical research
+  and knowledge. We strive to inculcate a culture of research and generate
+  excitement about the field of technology by propagating the spirit of
+  competitive collaboration and organising engaging events. The IEEE-IIITD
+  student branch also consists of the Women in Engineering sub-chapter and
+  the CompSoc sub-chapter.
+
+  With one of the biggest and most diverse teams of all the clubs and a
+  roster of unique events and workshops, IEEE-IIITD is one of the best places
+  to be to hone your skills and have fun while at it.
+
+# --- Membership -----------------------------------------------------------
+join_url: "https://forms.gle/5xoKNbj6moQpRn2o9"
+join_heading: "Become part of the community."
+join_perks: |
+  Eligibility for IEEE scholarships, grants and awards.
+  Direct access to faculty members across departments.
+  Conversations with distinguished people from industry and academia.
+  Ownership of the institute's flagship technical events.
+
+# --- Contact --------------------------------------------------------------
+contact_email: "ieee@iiitd.ac.in"
+contact_address: "IIIT Delhi, Okhla Industrial Estate, Phase III, New Delhi 110020"
+contact_heading: "Let's build something together."
+contact_body: >-
+  Whether you are a student with a question or an organisation looking to
+  collaborate, this reaches the branch directly.
+
+# --- Social ---------------------------------------------------------------
+instagram_url: "https://www.instagram.com/ieeeiiitdelhi/"
+facebook_url: "https://www.facebook.com/ieeeiiitd/"
+linkedin_url: "https://www.linkedin.com/company/ieee-iiitd/"
+youtube_url: "https://www.youtube.com/channel/UCKqQYeZ_yOSWL0BQ7eWUqRA"
+twitter_url: "https://twitter.com/ieee_d/"
+branding_url: "https://github.com/IEEE-IIIT-Delhi/branding"
+
+# --- Affiliations ---------------------------------------------------------
+institute_url: "https://iiitd.ac.in/"
+ieee_url: "https://www.ieee.org/"
+wie_url: "https://www.wie.ieee.org/"
+compsoc_url: "https://www.computer.org/"
+
+# --- SEO ------------------------------------------------------------------
+meta_description: >-
+  The IEEE student branch at IIIT Delhi. Technical events, workshops, talks
+  and competitions run by students, in affiliation with IEEE, Women in
+  Engineering and the IEEE Computer Society.

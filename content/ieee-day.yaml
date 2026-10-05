@@ -1,0 +1,33 @@
+# IEEE Day editions, newest first.
+#
+# IEEE Day marks the first time engineers worldwide gathered to share their
+# technical ideas, in 1884. It is celebrated on the first Tuesday of October.
+#
+# `stats`, `highlights` and `gallery` start empty because the previous
+# website never recorded them. Fill them in after each celebration and run
+# `just content-import` - the page renders whichever sections have content
+# and quietly omits the rest, so partial entries look intentional.
+#
+# Tag an event with `ieee_day_year: 2026` in events.yaml to list it here.
+
+- year: 2026
+  theme: "Leveraging Technology for a Better Tomorrow"
+  tagline: "One day. Every section. The same idea."
+  celebrated_on: 2026-10-06
+  is_current: true
+  description: |
+    On the first Tuesday of October, IEEE sections in more than a hundred
+    countries mark the anniversary of the first gathering of engineers who
+    came together to share what they had built. That was 1884. The
+    organisation it started is now the largest technical professional body in
+    the world.
+
+    IEEE Day at IIIT Delhi is our version of that: a day given over to the
+    things the branch exists for. Talks from people doing the work,
+    hands-on sessions where you leave having built something, and
+    competitions that are more fun than they are serious.
+
+    Everyone on campus is welcome, member or not.
+  stats: []
+  highlights: []
+  gallery: []

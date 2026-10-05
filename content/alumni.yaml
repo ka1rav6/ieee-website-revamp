@@ -1,0 +1,155 @@
+# Alumni and distinguished members.
+# Only publicly shareable details belong in this file.
+# Graduation years are blank where the previous site did not record them.
+
+- name: "Prakhar Prasad"
+  slug: "prakhar-prasad"
+  photo: "/legacy/people/prakhar.webp"
+  current_role: "Product Design Intern"
+  current_organization: "Upstox"
+  is_featured: true
+- name: "Garmit Pant"
+  slug: "garmit-pant"
+  photo: "/legacy/people/garmit.webp"
+  current_role: "EDG Intern"
+  current_organization: "Mathworks"
+  is_featured: true
+- name: "Ansh Arora"
+  slug: "ansh-arora"
+  photo: "/legacy/people/ansh.webp"
+  current_role: "SWE Intern"
+  current_organization: "Microsoft"
+  is_featured: true
+- name: "Meetakshi Setiya"
+  slug: "meetakshi-setiya"
+  photo: "/legacy/people/meetakshi-setiya.webp"
+  current_role: "SWE Intern"
+  current_organization: "Microsoft"
+  is_featured: true
+- name: "Sachleen Kaur"
+  slug: "sachleen-kaur"
+  photo: "/legacy/people/sachleen.webp"
+  current_role: "SWE Intern"
+  current_organization: "Google"
+  is_featured: true
+- name: "Kevin Paul"
+  slug: "kevin-paul"
+  photo: "/legacy/people/kevin.webp"
+  current_role: "SWE Intern"
+  current_organization: "Google"
+  is_featured: true
+- name: "Rohan Dhar"
+  slug: "rohan-dhar"
+  photo: "/legacy/people/rohan.webp"
+  current_role: "SWE Intern"
+  current_organization: "Google"
+  is_featured: true
+- name: "Mihir Chaturvedi"
+  slug: "mihir-chaturvedi"
+  photo: "/legacy/people/mihir.webp"
+  current_role: "Engineering Intern"
+  current_organization: "Sourcegraph"
+  is_featured: true
+- name: "Daksh Thapar"
+  slug: "daksh-thapar"
+  photo: "/legacy/people/daksh.webp"
+  current_role: "SDE"
+  current_organization: "Mathworks"
+  is_featured: true
+- name: "Gursimran Kaur"
+  slug: "gursimran-kaur"
+  photo: "/legacy/people/gursimran.webp"
+  current_role: "SDE"
+  current_organization: "DP World"
+  is_featured: true
+- name: "Shragvi Sidarth Jha"
+  slug: "shragvi-sidarth-jha"
+  photo: "/legacy/people/sidarth.webp"
+  current_role: "Engineering Intern"
+  current_organization: "Qualcomm"
+  is_featured: true
+- name: "Srijan Jain"
+  slug: "srijan-jain"
+  photo: "/legacy/people/srijan.webp"
+  current_role: "Co-founder, respct.co"
+  is_featured: true
+- name: "Saksham Gupta"
+  slug: "saksham-gupta"
+  photo: "/legacy/people/saksham.webp"
+  current_role: "Engineering Intern"
+  current_organization: "Qualcomm"
+  is_featured: true
+- name: "Sarthak Chandra"
+  slug: "sarthak-chandra"
+  photo: "/legacy/people/sarthak.webp"
+  current_role: "Business Analyst Intern"
+  current_organization: "Panasonic"
+  is_featured: true
+- name: "Neelabhro Roy"
+  slug: "neelabhro-roy"
+  photo: "/legacy/people/neelabhro.webp"
+  current_role: "EECS"
+  current_organization: "KTH Royal Institute of Technology, Sweden"
+  is_featured: true
+- name: "Osaid Rehman Nasir"
+  slug: "osaid-rehman-nasir"
+  photo: "/legacy/people/osaid.webp"
+  current_role: "SDE"
+  current_organization: "LinkedIn"
+  is_featured: true
+- name: "Suryaansh Mata"
+  slug: "suryaansh-mata"
+  photo: "/legacy/people/suryaansh.webp"
+  current_role: "Associate Engineer"
+  current_organization: "Mathworks"
+  is_featured: true
+- name: "Munish Thakral"
+  slug: "munish-thakral"
+  photo: "/legacy/people/munish.webp"
+  current_role: "SDE"
+  current_organization: "AMEX"
+  is_featured: true
+- name: "Vaibhav Goel"
+  slug: "vaibhav-goel"
+  photo: "/legacy/people/vaibhav.webp"
+  current_role: "MTS"
+  current_organization: "Adobe"
+  is_featured: true
+- name: "Utsav Rohilla"
+  slug: "utsav-rohilla"
+  photo: "/legacy/people/utsav.webp"
+  current_role: "ACM ICPC World Finalist'19 & SDE"
+  current_organization: "Google"
+  is_featured: true
+- name: "Chahat Ahuja"
+  slug: "chahat-ahuja"
+  photo: "/legacy/people/chahat.webp"
+  is_featured: true
+- name: "Satyam"
+  slug: "satyam"
+  photo: "/legacy/people/satyam-ieee.webp"
+  is_featured: true
+- name: "Yuvraj Verma"
+  slug: "yuvraj-verma"
+  photo: "/legacy/people/yuvraj-verma.webp"
+  is_featured: true
+- name: "Divyansh Mishra"
+  slug: "divyansh-mishra"
+  photo: "/legacy/people/divyansh-mishra.webp"
+  is_featured: true
+- name: "Devesh Roy"
+  slug: "devesh-roy"
+  photo: "/legacy/people/devesh-roy.webp"
+  is_featured: true
+- name: "Anika Aharwal"
+  slug: "anika-aharwal"
+  photo: "/legacy/people/anika-aharwal.webp"
+  is_featured: true
+- name: "Abhimanyu Sharma"
+  slug: "abhimanyu-sharma"
+  photo: "/legacy/people/abhimanyu-sharma.webp"
+  is_featured: true
+- name: "Vikas Meena"
+  slug: "vikas-meena"
+  photo: "/legacy/people/vikas-meena.webp"
+  is_featured: true
