@@ -1,8 +1,8 @@
 """initial schema
 
-Revision ID: 89e537dacdf4
+Revision ID: 97f8416a1070
 Revises: 
-Create Date: 2026-10-06 00:31:56.941724
+Create Date: 2026-10-06 00:36:02.602440
 """
 
 from __future__ import annotations
@@ -13,7 +13,7 @@ from alembic import op
 import sqlalchemy as sa
 
 
-revision: str = '89e537dacdf4'
+revision: str = '97f8416a1070'
 down_revision: str | None = None
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
@@ -97,10 +97,10 @@ def upgrade() -> None:
     sa.Column('email', sa.String(length=255), nullable=False),
     sa.Column('organization', sa.String(length=200), nullable=True),
     sa.Column('phone', sa.String(length=40), nullable=True),
-    sa.Column('inquiry_type', sa.Enum('GENERAL', 'MEMBERSHIP', 'INDUSTRY_COLLABORATION', 'EVENT_SPONSORSHIP', 'WORKSHOP', 'TALK', 'RESEARCH', 'OTHER', name='inquiry_type'), nullable=False),
+    sa.Column('inquiry_type', sa.Enum('general', 'membership', 'industry_collaboration', 'event_sponsorship', 'workshop', 'talk', 'research', 'other', name='inquiry_type'), nullable=False),
     sa.Column('subject', sa.String(length=250), nullable=True),
     sa.Column('message', sa.Text(), nullable=False),
-    sa.Column('status', sa.Enum('NEW', 'READ', 'REPLIED', 'ARCHIVED', name='submission_status'), nullable=False),
+    sa.Column('status', sa.Enum('new', 'read', 'replied', 'archived', name='submission_status'), nullable=False),
     sa.Column('admin_notes', sa.Text(), nullable=True),
     sa.Column('source_ip', sa.String(length=64), nullable=True),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
@@ -158,7 +158,7 @@ def upgrade() -> None:
     sa.Column('slug', sa.String(length=160), nullable=False),
     sa.Column('name', sa.String(length=160), nullable=False),
     sa.Column('position', sa.String(length=160), nullable=True),
-    sa.Column('category', sa.Enum('FACULTY', 'CORE', 'EXECUTIVE', 'MENTOR', name='team_category'), nullable=False),
+    sa.Column('category', sa.Enum('faculty', 'core', 'executive', 'mentor', name='team_category'), nullable=False),
     sa.Column('photo', sa.String(length=500), nullable=True),
     sa.Column('department', sa.String(length=160), nullable=True),
     sa.Column('year', sa.String(length=40), nullable=True),

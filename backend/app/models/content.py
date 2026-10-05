@@ -30,7 +30,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base, TimestampMixin
 
 
-class TeamCategory(str, enum.Enum):
+class TeamCategory(enum.StrEnum):
     """Groupings used on /team, mirroring how the branch actually organises.
 
     Values are stable identifiers used by the API and content files; display
@@ -43,7 +43,7 @@ class TeamCategory(str, enum.Enum):
     MENTOR = "mentor"
 
 
-class InquiryType(str, enum.Enum):
+class InquiryType(enum.StrEnum):
     """What a contact submission is about, chosen by the sender."""
 
     GENERAL = "general"
@@ -56,13 +56,27 @@ class InquiryType(str, enum.Enum):
     OTHER = "other"
 
 
-class SubmissionStatus(str, enum.Enum):
+class SubmissionStatus(enum.StrEnum):
     """Admin triage state for a contact submission."""
 
     NEW = "new"
     READ = "read"
     REPLIED = "replied"
     ARCHIVED = "archived"
+
+
+def _enum_column(enum_type: type[enum.Enum], name: str) -> Enum:
+    """A Postgres enum that stores the member *values*, not their names.
+
+    SQLAlchemy defaults to persisting `.name` (e.g. "CORE"), which would make
+    stored rows disagree with the lowercase identifiers used by the API and
+    the content files. Storing values keeps all three readable and identical.
+    """
+    return Enum(
+        enum_type,
+        name=name,
+        values_callable=lambda members: [member.value for member in members],
+    )
 
 
 class Admin(Base, TimestampMixin):
@@ -113,9 +127,7 @@ class BlogTag(Base, TimestampMixin):
     slug: Mapped[str] = mapped_column(String(80), unique=True, nullable=False, index=True)
     name: Mapped[str] = mapped_column(String(80), nullable=False)
 
-    posts: Mapped[list[BlogPost]] = relationship(
-        secondary=blog_post_tags, back_populates="tags"
-    )
+    posts: Mapped[list[BlogPost]] = relationship(secondary=blog_post_tags, back_populates="tags")
 
 
 class BlogPost(Base, TimestampMixin):
@@ -171,7 +183,7 @@ class TeamMember(Base, TimestampMixin):
     name: Mapped[str] = mapped_column(String(160), nullable=False)
     position: Mapped[str | None] = mapped_column(String(160))
     category: Mapped[TeamCategory] = mapped_column(
-        Enum(TeamCategory, name="team_category"), nullable=False, index=True
+        _enum_column(TeamCategory, "team_category"), nullable=False, index=True
     )
     photo: Mapped[str | None] = mapped_column(String(500))
     department: Mapped[str | None] = mapped_column(String(160))
@@ -348,12 +360,12 @@ class ContactSubmission(Base, TimestampMixin):
     organization: Mapped[str | None] = mapped_column(String(200))
     phone: Mapped[str | None] = mapped_column(String(40))
     inquiry_type: Mapped[InquiryType] = mapped_column(
-        Enum(InquiryType, name="inquiry_type"), nullable=False, index=True
+        _enum_column(InquiryType, "inquiry_type"), nullable=False, index=True
     )
     subject: Mapped[str | None] = mapped_column(String(250))
     message: Mapped[str] = mapped_column(Text, nullable=False)
     status: Mapped[SubmissionStatus] = mapped_column(
-        Enum(SubmissionStatus, name="submission_status"),
+        _enum_column(SubmissionStatus, "submission_status"),
         default=SubmissionStatus.NEW,
         nullable=False,
         index=True,
