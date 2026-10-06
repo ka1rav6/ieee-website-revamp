@@ -8,6 +8,7 @@
  * under `prefers-reduced-motion`.
  */
 
+import { Fragment } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { useCountUp } from '@/hooks/useInteraction';
@@ -215,22 +216,22 @@ export function Hero({ stats }: { stats: SiteStats | null }) {
 
           <h1 className="fluid-display mt-6 font-bold">
             {words.slice(0, accentFrom).map((word, index) => (
-              <AnimatedWord key={`lead-${index}`} index={index} reducedMotion={reducedMotion}>
-                {word}{' '}
-              </AnimatedWord>
+              <Fragment key={`lead-${index}`}>
+                <AnimatedWord index={index} reducedMotion={reducedMotion}>
+                  {word}
+                </AnimatedWord>{' '}
+              </Fragment>
             ))}
             {/* One gradient box spanning the trailing words, so the sweep runs
                 across the phrase instead of restarting at every space. */}
             <span className="text-gradient">
               {words.slice(accentFrom).map((word, index, accentWords) => (
-                <AnimatedWord
-                  key={`accent-${index}`}
-                  index={accentFrom + index}
-                  reducedMotion={reducedMotion}
-                >
-                  {word}
-                  {index < accentWords.length - 1 ? ' ' : ''}
-                </AnimatedWord>
+                <Fragment key={`accent-${index}`}>
+                  <AnimatedWord index={accentFrom + index} reducedMotion={reducedMotion}>
+                    {word}
+                  </AnimatedWord>
+                  {index < accentWords.length - 1 ? ' ' : null}
+                </Fragment>
               ))}
             </span>
           </h1>

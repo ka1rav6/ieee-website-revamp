@@ -84,29 +84,45 @@ export function useCountUp(target: number, durationMs = 1400) {
 
     let frame = 0;
 
+    const run = () => {
+      if (hasRun.current) return;
+      hasRun.current = true;
+      observer.disconnect();
+      window.clearTimeout(fallback);
+
+      const start = performance.now();
+      const tick = (now: number) => {
+        const progress = Math.min(1, (now - start) / durationMs);
+        // Ease out so the number decelerates into its final value.
+        const eased = 1 - Math.pow(1 - progress, 3);
+        setValue(Math.round(target * eased));
+        if (progress < 1) frame = requestAnimationFrame(tick);
+      };
+      frame = requestAnimationFrame(tick);
+    };
+
     const observer = new IntersectionObserver(
       (entries) => {
-        const entry = entries[0];
-        if (!entry?.isIntersecting || hasRun.current) return;
-        hasRun.current = true;
-        observer.disconnect();
-
-        const start = performance.now();
-        const tick = (now: number) => {
-          const progress = Math.min(1, (now - start) / durationMs);
-          // Ease out so the number decelerates into its final value.
-          const eased = 1 - Math.pow(1 - progress, 3);
-          setValue(Math.round(target * eased));
-          if (progress < 1) frame = requestAnimationFrame(tick);
-        };
-        frame = requestAnimationFrame(tick);
+        if (entries[0]?.isIntersecting) run();
       },
       { threshold: 0.4 },
     );
 
+    // The number is the information; counting up to it is decoration. If the
+    // observer has not fired by now - a background tab, a hidden container,
+    // a browser that never intersects it - show the real value rather than
+    // leaving a permanent and incorrect zero on screen.
+    const fallback = window.setTimeout(() => {
+      if (hasRun.current) return;
+      hasRun.current = true;
+      observer.disconnect();
+      setValue(target);
+    }, durationMs + 1200);
+
     observer.observe(element);
     return () => {
       observer.disconnect();
+      window.clearTimeout(fallback);
       if (frame) cancelAnimationFrame(frame);
     };
   }, [target, durationMs, reducedMotion]);
