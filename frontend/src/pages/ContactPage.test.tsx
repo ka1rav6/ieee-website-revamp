@@ -9,6 +9,7 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderWithProviders } from '@/test/utils';
+import type ContactPageComponent from './ContactPage';
 
 // The settings provider would otherwise fetch on mount.
 vi.mock('@/hooks/useSiteSettings', () => ({
@@ -37,7 +38,7 @@ async function fillValidForm(user: ReturnType<typeof userEvent.setup>) {
 }
 
 describe('ContactPage', () => {
-  let ContactPage: typeof import('./ContactPage').default;
+  let ContactPage: typeof ContactPageComponent;
 
   beforeEach(async () => {
     submitContact.mockReset().mockResolvedValue({ id: 1, created_at: '2026-01-01T00:00:00Z' });

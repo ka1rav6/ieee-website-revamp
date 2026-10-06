@@ -6,17 +6,19 @@ set -e
 echo "[entrypoint] applying database migrations"
 alembic upgrade head
 
-# Optional: seed/refresh content from the version-controlled content/ tree.
-# Off by default so a deploy never silently overwrites admin edits.
+# The image installs the application's dependencies but not the application
+# itself as a package, so the `ieee-content` and `ieee-admin` console scripts
+# that `just` uses locally do not exist here. The modules behind them are run
+# directly instead.
 if [ "${CONTENT_IMPORT_ON_START:-false}" = "true" ]; then
     echo "[entrypoint] importing content/"
-    ieee-content import
+    python -m app.content.cli import
 fi
 
 # Optional: ensure the single admin account exists. Requires ADMIN_PASSWORD.
 if [ "${ADMIN_BOOTSTRAP_ON_START:-false}" = "true" ] && [ -n "${ADMIN_PASSWORD:-}" ]; then
     echo "[entrypoint] ensuring administrator account"
-    ieee-admin
+    python -m app.cli.admin
 fi
 
 echo "[entrypoint] starting: $*"

@@ -13,7 +13,22 @@ from typing import Literal
 from pydantic import Field, computed_field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-REPO_ROOT = Path(__file__).resolve().parents[3]
+PACKAGE_ROOT = Path(__file__).resolve().parents[2]
+REPO_ROOT = PACKAGE_ROOT.parent
+
+
+def _default_content_dir() -> Path:
+    """Locate the content/ tree.
+
+    It sits beside the backend in a checkout and beside the app package in
+    the container image, so both are checked rather than assuming a fixed
+    depth. CONTENT_DIR overrides this.
+    """
+    for candidate in (REPO_ROOT / "content", PACKAGE_ROOT / "content"):
+        if candidate.is_dir():
+            return candidate
+    return REPO_ROOT / "content"
+
 
 Environment = Literal["development", "test", "production"]
 EmailBackend = Literal["console", "smtp", "none"]
@@ -69,7 +84,7 @@ class Settings(BaseSettings):
     smtp_use_tls: bool = True
 
     # --- Content ---
-    content_dir: Path = REPO_ROOT / "content"
+    content_dir: Path = Field(default_factory=_default_content_dir)
 
     @field_validator("site_url")
     @classmethod

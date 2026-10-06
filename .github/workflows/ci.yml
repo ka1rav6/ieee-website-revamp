@@ -1,0 +1,205 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# A new push supersedes an in-flight run on the same branch.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: '22'
+  PYTHON_VERSION: '3.12'
+
+jobs:
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Check formatting
+        run: npm run format:check
+
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Test
+        run: npm run test
+
+      - name: Build
+        run: npm run build
+
+  backend:
+    name: Backend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: ieee
+          POSTGRES_PASSWORD: ci-password
+          POSTGRES_DB: ieee
+        ports:
+          - 5432:5432
+        # The job must not start querying before Postgres accepts connections.
+        options: >-
+          --health-cmd "pg_isready -U ieee"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      POSTGRES_USER: ieee
+      POSTGRES_PASSWORD: ci-password
+      POSTGRES_DB: ieee
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: 5432
+      # Not a secret: this value only ever signs tokens inside the CI job.
+      SECRET_KEY: ci-only-signing-key-not-used-anywhere-real
+      ENVIRONMENT: test
+      EMAIL_BACKEND: none
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: backend/uv.lock
+
+      - name: Install dependencies
+        run: uv sync --locked --all-extras
+
+      - name: Lint
+        run: uv run ruff check .
+
+      - name: Check formatting
+        run: uv run ruff format --check .
+
+      - name: Verify migrations apply to an empty database
+        run: uv run alembic upgrade head
+
+      - name: Verify models and migrations agree
+        # An empty autogenerate diff proves no model change was committed
+        # without its migration.
+        run: |
+          uv run alembic revision --autogenerate -m "ci drift check" --rev-id ci_drift
+          if grep -qE '^\s+op\.(create|drop|alter|add)' alembic/versions/*ci_drift*.py; then
+            echo "::error::Models have changed without a migration. Run: just db-migration \"describe the change\""
+            cat alembic/versions/*ci_drift*.py
+            exit 1
+          fi
+          rm -f alembic/versions/*ci_drift*.py
+
+      - name: Test
+        run: uv run pytest
+
+      - name: Validate content files
+        working-directory: .
+        run: uv --project backend run ieee-content validate
+
+  docker:
+    name: Docker image
+    runs-on: ubuntu-latest
+    # Only worth building once the code that goes into it is known good.
+    needs: [frontend, backend]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build the production image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          load: true
+          tags: ieee-iiitd-website:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Check the image starts and serves the site
+        env:
+          SECRET_KEY: ci-only-signing-key-not-used-anywhere-real
+        run: |
+          docker network create ieee-ci
+
+          docker run -d --name postgres --network ieee-ci \
+            -e POSTGRES_USER=ieee -e POSTGRES_PASSWORD=ci-password -e POSTGRES_DB=ieee \
+            --health-cmd "pg_isready -U ieee" --health-interval 3s --health-retries 10 \
+            postgres:17-alpine
+
+          echo "Waiting for Postgres"
+          for _ in $(seq 1 30); do
+            [ "$(docker inspect -f '{{.State.Health.Status}}' postgres)" = healthy ] && break
+            sleep 2
+          done
+
+          docker run -d --name app --network ieee-ci -p 8000:8000 \
+            -e ENVIRONMENT=production \
+            -e SITE_URL=https://ieee.iiitd.edu.in \
+            -e SECRET_KEY="$SECRET_KEY" \
+            -e POSTGRES_HOST=postgres -e POSTGRES_USER=ieee \
+            -e POSTGRES_PASSWORD=ci-password -e POSTGRES_DB=ieee \
+            -e CONTENT_IMPORT_ON_START=true \
+            ieee-iiitd-website:ci
+
+          echo "Waiting for the app"
+          for _ in $(seq 1 30); do
+            if curl -fsS http://localhost:8000/api/v1/health >/dev/null 2>&1; then
+              ready=1
+              break
+            fi
+            sleep 2
+          done
+
+          if [ -z "${ready:-}" ]; then
+            echo "::error::The container never became healthy"
+            docker logs app
+            exit 1
+          fi
+
+          # The image must serve the API, the built frontend and the content
+          # it imported on start - not just answer the health check.
+          curl -fsS http://localhost:8000/api/v1/health
+          curl -fsS http://localhost:8000/ | grep -q '<div id="root">'
+          curl -fsS http://localhost:8000/robots.txt | grep -q 'Disallow: /admin'
+          test "$(curl -fsS http://localhost:8000/api/v1/team | python3 -c 'import sys,json;print(len(json.load(sys.stdin)))')" -gt 0
+
+          # Interactive docs must not be exposed in production.
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8000/api/docs)" = 404
+
+          echo "Image verified."
+
+      - name: Container logs on failure
+        if: failure()
+        run: docker logs app || true
