@@ -109,15 +109,31 @@ jobs:
 
       - name: Verify models and migrations agree
         # An empty autogenerate diff proves no model change was committed
-        # without its migration.
+        # without its migration. Alembic names the file from the message and
+        # a timestamp, not the revision id, so the new file is found by
+        # diffing the directory rather than by guessing its name.
         run: |
-          uv run alembic revision --autogenerate -m "ci drift check" --rev-id ci_drift
-          if grep -qE '^\s+op\.(create|drop|alter|add)' alembic/versions/*ci_drift*.py; then
-            echo "::error::Models have changed without a migration. Run: just db-migration \"describe the change\""
-            cat alembic/versions/*ci_drift*.py
+          set -euo pipefail
+          before=$(mktemp)
+          ls alembic/versions/*.py > "$before"
+
+          uv run alembic revision --autogenerate -m "ci drift check"
+
+          generated=$(ls alembic/versions/*.py | grep -vxF -f "$before")
+          if [ -z "$generated" ]; then
+            echo "::error::Alembic produced no revision file; the drift check could not run."
             exit 1
           fi
-          rm -f alembic/versions/*ci_drift*.py
+
+          status=0
+          if grep -qE '^[[:space:]]+op\.(create|drop|alter|add)' "$generated"; then
+            echo "::error::Models have changed without a migration. Run: just db-migration \"describe the change\""
+            cat "$generated"
+            status=1
+          fi
+
+          rm -f "$generated"
+          exit "$status"
 
       - name: Test
         run: uv run pytest
