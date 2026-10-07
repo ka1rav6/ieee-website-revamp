@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import { cx } from '@/utils/format';
 import { ArrowRightIcon } from './Icons';
 import { Reveal } from './Reveal';
+import { Parallax } from './Scroll';
 
 interface SectionHeaderProps {
   /** Small mono label above the title. */
@@ -68,7 +69,7 @@ interface SectionProps {
   tone?: 'base' | 'sunken';
   /** Tighter vertical padding, for sections that follow one another closely. */
   compact?: boolean;
-  /** Draws a hairline across the top of the band. */
+  /** Draws a trace across the top of the band, pulsed by scroll. */
   divided?: boolean;
   'aria-labelledby'?: string;
 }
@@ -93,12 +94,7 @@ export function Section({
       )}
       {...rest}
     >
-      {divided && (
-        <div
-          className="absolute inset-x-0 top-0 h-px bg-[var(--border-subtle)]"
-          aria-hidden="true"
-        />
-      )}
+      {divided && <div className="trace-rule absolute inset-x-0 top-0" aria-hidden="true" />}
       {children}
     </section>
   );
@@ -123,8 +119,11 @@ export function PageHeader({
 }) {
   return (
     <header className="relative overflow-hidden border-b border-[var(--border-subtle)] pt-[calc(var(--header-height)+3.5rem)] pb-14 md:pt-[calc(var(--header-height)+5rem)] md:pb-20">
-      <div className="grid-field absolute inset-0" aria-hidden="true" />
-      <div className="glow -top-32 left-1/4 size-80 bg-[var(--glow-primary)]" aria-hidden="true" />
+      <Parallax className="absolute inset-0" distance={40}>
+        <div className="grid-field absolute inset-0" />
+        <div className="glow -top-32 left-1/4 size-80 bg-[var(--glow-primary)]" />
+        <div className="glow top-1/2 right-0 size-72 bg-[var(--glow-signal)]" />
+      </Parallax>
       <div className="shell relative">
         <div className="max-w-3xl space-y-4">
           {eyebrow && <p className="eyebrow">{eyebrow}</p>}
