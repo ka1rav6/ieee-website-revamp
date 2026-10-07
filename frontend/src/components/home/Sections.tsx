@@ -10,6 +10,8 @@
 import { Link } from 'react-router-dom';
 import { Section, SectionHeader } from '@/components/ui/Section';
 import { Reveal, Stagger, StaggerItem } from '@/components/ui/Reveal';
+import { Parallax } from '@/components/ui/Scroll';
+import { Tilt } from '@/components/ui/Interactive';
 import { BlogCard } from '@/components/cards/BlogCard';
 import { EventCard } from '@/components/cards/EventCard';
 import { AlumniTile, TeamCard } from '@/components/cards/PersonCard';
@@ -92,10 +94,15 @@ export function CoreTeamBand({ members }: { members: TeamMember[] }) {
           action={{ label: 'Meet everyone', to: '/team' }}
         />
 
-        <Stagger as="ul" className="grid gap-5 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
+        <Stagger
+          as="ul"
+          className="tilt-scene grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4"
+        >
           {members.slice(0, 8).map((member) => (
             <StaggerItem as="li" key={member.slug}>
-              <TeamCard member={member} />
+              <Tilt className="h-full" max={4}>
+                <TeamCard member={member} />
+              </Tilt>
             </StaggerItem>
           ))}
         </Stagger>
@@ -128,9 +135,9 @@ export function AlumniBand({ alumni }: { alumni: Alumnus[] }) {
         </div>
 
         <Reveal>
-          <ul className="scroll-x flex gap-5 px-6 pb-4 [scrollbar-width:none] lg:px-[max(1.5rem,calc((100vw-78rem)/2+1.5rem))]">
+          <ul className="scroll-x flex snap-x snap-proximity gap-5 px-6 pb-4 [scrollbar-width:none] lg:px-[max(1.5rem,calc((100vw-78rem)/2+1.5rem))]">
             {alumni.map((alumnus) => (
-              <li key={alumnus.slug}>
+              <li key={alumnus.slug} className="snap-start">
                 <AlumniTile alumnus={alumnus} />
               </li>
             ))}
@@ -179,14 +186,15 @@ export function IeeeDayBand({ edition }: { edition: IeeeDayEdition | null }) {
     <Section tone="sunken" compact divided>
       <div className="shell">
         <Reveal>
-          <div className="card relative overflow-hidden">
+          <div className="card pads relative overflow-hidden">
             {/* The band gets its own glow so it reads as a distinct moment in
-                the page without needing a different palette. */}
-            <div
-              className="glow -top-24 -right-16 size-80 bg-[var(--glow-secondary)]"
-              aria-hidden="true"
-            />
-            <div className="grid-field absolute inset-0 opacity-60" aria-hidden="true" />
+                the page without needing a different palette. Drifting it with
+                scroll is what keeps the panel from reading as a flat inset. */}
+            <Parallax className="absolute inset-0" distance={28}>
+              <div className="glow -top-24 -right-16 size-80 bg-[var(--glow-secondary)]" />
+              <div className="glow -bottom-20 left-0 size-72 bg-[var(--glow-signal)]" />
+              <div className="grid-field absolute inset-0 opacity-60" />
+            </Parallax>
 
             <div className="relative grid gap-8 p-7 md:grid-cols-12 md:items-center md:p-12">
               <div className="space-y-4 md:col-span-7">
@@ -247,10 +255,10 @@ export function JoinCta({
           <div className="relative overflow-hidden rounded-[var(--radius-card)] border border-[var(--border-subtle)] bg-[var(--surface-inverted)] px-7 py-12 md:px-14 md:py-16">
             {/* On the inverted surface the body text colour would vanish, so
                 this block sets its own text colours explicitly. */}
-            <div
-              className="glow -bottom-32 left-1/4 size-96 bg-[var(--glow-primary)] opacity-70"
-              aria-hidden="true"
-            />
+            <Parallax className="absolute inset-0" distance={36}>
+              <div className="glow -bottom-32 left-1/4 size-96 bg-[var(--glow-primary)] opacity-70" />
+              <div className="glow -top-24 right-1/4 size-72 bg-[var(--glow-signal)] opacity-60" />
+            </Parallax>
 
             <div className="relative grid gap-10 md:grid-cols-12 md:items-center">
               <div className="space-y-5 md:col-span-6">

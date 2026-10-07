@@ -8,7 +8,9 @@
 
 import type { ReactNode } from 'react';
 import { Section, SectionHeader } from '@/components/ui/Section';
-import { Stagger, StaggerItem } from '@/components/ui/Reveal';
+import { Reveal, Stagger, StaggerItem } from '@/components/ui/Reveal';
+import { WordsReveal } from '@/components/ui/Scroll';
+import { Tilt } from '@/components/ui/Interactive';
 import {
   BookIcon,
   ChipIcon,
@@ -71,16 +73,18 @@ const ACTIVITIES: Activity[] = [
 function ActivityCard({ activity }: { activity: Activity }) {
   return (
     <StaggerItem as="li" className={activity.wide ? 'sm:col-span-2 lg:col-span-2' : undefined}>
-      <article className="card card-interactive group flex h-full flex-col gap-3 p-6">
-        <span
-          className="grid size-10 place-items-center rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-sunken)] text-accent transition-colors duration-300 group-hover:border-accent"
-          aria-hidden="true"
-        >
-          {activity.icon}
-        </span>
-        <h3 className="text-lg font-semibold">{activity.title}</h3>
-        <p className="text-sm text-muted">{activity.description}</p>
-      </article>
+      <Tilt className="h-full">
+        <article className="card card-interactive pads group flex h-full flex-col gap-3 p-6">
+          <span
+            className="grid size-10 place-items-center rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-sunken)] text-accent transition-colors duration-300 group-hover:border-accent"
+            aria-hidden="true"
+          >
+            {activity.icon}
+          </span>
+          <h3 className="text-lg font-semibold">{activity.title}</h3>
+          <p className="text-sm text-muted">{activity.description}</p>
+        </article>
+      </Tilt>
     </StaggerItem>
   );
 }
@@ -95,7 +99,7 @@ export function WhatWeDo() {
           description="Everything here is built and run by students. The scale varies from a two-hour workshop to a 24-hour hunt across the internet."
         />
 
-        <Stagger as="ul" className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <Stagger as="ul" className="tilt-scene grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {ACTIVITIES.map((activity) => (
             <ActivityCard key={activity.title} activity={activity} />
           ))}
@@ -116,11 +120,14 @@ export function AboutPreview({ summary, paragraphs }: { summary: string; paragra
     <Section id="about">
       <div className="shell grid gap-10 lg:grid-cols-12 lg:gap-16">
         <div className="lg:col-span-5">
-          <SectionHeader
-            eyebrow="About"
-            title={<span className="text-balance">{summary}</span>}
-            as="h2"
-          />
+          <Reveal className="space-y-3">
+            <p className="eyebrow">About</p>
+            <WordsReveal
+              as="h2"
+              text={summary}
+              className="fluid-heading text-balance font-semibold text-strong"
+            />
+          </Reveal>
           <div className="mt-7 flex items-center gap-3">
             <SparkIcon className="size-5 shrink-0 text-emphasis" />
             <p className="font-mono text-xs tracking-wide text-muted">
@@ -129,20 +136,21 @@ export function AboutPreview({ summary, paragraphs }: { summary: string; paragra
           </div>
         </div>
 
-        <div className="space-y-5 lg:col-span-7">
+        <Stagger className="space-y-5 lg:col-span-7" step={0.08}>
           {paragraphs.map((paragraph, index) => (
-            <p
-              key={index}
-              className={
-                index === 0
-                  ? 'text-lg leading-relaxed text-default'
-                  : 'text-base leading-relaxed text-muted'
-              }
-            >
-              {paragraph}
-            </p>
+            <StaggerItem key={index}>
+              <p
+                className={
+                  index === 0
+                    ? 'text-lg leading-relaxed text-default'
+                    : 'text-base leading-relaxed text-muted'
+                }
+              >
+                {paragraph}
+              </p>
+            </StaggerItem>
           ))}
-        </div>
+        </Stagger>
       </div>
     </Section>
   );
