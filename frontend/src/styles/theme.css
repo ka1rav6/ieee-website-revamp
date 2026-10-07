@@ -1,10 +1,12 @@
 /* =========================================================================
    IEEE IIIT Delhi - design tokens
    =========================================================================
-   The palette is built from IEEE's brand blue (#00629B) but deliberately
-   does not stop there: a bright azure carries interaction, and a warm amber
-   carries emphasis. Blue alone would read as corporate and flat, and would
-   leave nothing to draw the eye to what matters on a page.
+   The identity starts at IEEE's brand blue (#00629B) and is then taken
+   somewhere specific: a printed circuit board. Blue stays the brand and
+   carries primary actions, but the colours doing the everyday work are the
+   ones you find on a board - the cyan of a signal on a scope, the copper of
+   a trace, the green of a solder mask. Blue alone would read as corporate
+   and flat, and would leave nothing to draw the eye.
 
    Every colour is defined on bare :root so a value always exists. The dark
    theme redefines only the tokens that change, under both a media query
@@ -26,22 +28,27 @@
   --color-ieee-900: #082f4b;
   --color-ieee-950: #04121f;
 
-  /* Azure: interaction, links, focus. Brighter than brand blue so it reads
-     clearly against the dark ground. */
-  --color-azure-300: #7ad7ff;
-  --color-azure-400: #38c2fb;
-  --color-azure-500: #0ea5e9;
-  --color-azure-600: #0284c7;
+  /* Trace: interaction, links, focus - the live signal. Pulled toward teal
+     so it reads as a lit conductor rather than as more brand blue, and so
+     it separates clearly from the IEEE blue beside it. */
+  --color-trace-200: #b6f4ef;
+  --color-trace-300: #7fe9e0;
+  --color-trace-400: #2ad3cd;
+  --color-trace-500: #0aaeb2;
+  --color-trace-600: #088b92;
+  --color-trace-700: #066a73; /* Dark enough to carry body-sized link text. */
 
-  /* Amber: emphasis and counters. The one warm note, used sparingly. */
-  --color-ember-300: #ffd27a;
-  --color-ember-400: #ffb627;
-  --color-ember-500: #f59300;
-  --color-ember-600: #c26f00;
+  /* Copper: emphasis and counters. The one warm note, and the other half of
+     every board - trace metal and component leads. Used sparingly. */
+  --color-copper-200: #f7ddba;
+  --color-copper-300: #f0c38a;
+  --color-copper-400: #e39a4e;
+  --color-copper-500: #c8762a;
+  --color-copper-600: #9a5a1f;
 
-  /* Signal green and crimson, for status only - never as decoration. */
-  --color-signal-400: #34d399;
-  --color-signal-600: #059669;
+  /* Solder-mask green and crimson, for status only - never as decoration. */
+  --color-signal-400: #2fd48a;
+  --color-signal-600: #0f8f5f;
   --color-crimson-400: #fb7185;
   --color-crimson-600: #be123c;
 
@@ -64,71 +71,92 @@
   color-scheme: light;
 
   /* Surfaces, from the page backdrop inward. Three levels is enough to
-     express depth without the stack becoming muddy. */
-  --surface-base: #f6f8fb;
+     express depth without the stack becoming muddy. Each one is pulled a
+     few degrees toward cyan, so the whole page sits in the same light as
+     the accent rather than on neutral grey. */
+  --surface-base: #f4f8f9;
   --surface-raised: #ffffff;
-  --surface-sunken: #eceff4;
-  --surface-inverted: #04121f;
+  --surface-sunken: #e8eef0;
+  --surface-inverted: #04121a;
 
   /* Text, in descending prominence. */
-  --text-strong: #06131f;
-  --text-default: #1d2d3d;
-  --text-muted: #566675;
-  --text-faint: #8695a3;
+  --text-strong: #061418;
+  --text-default: #1c2e34;
+  --text-muted: #53666d;
+  --text-faint: #82949b;
   --text-on-brand: #ffffff;
 
-  --border-subtle: #dde3ea;
-  --border-default: #c7d1db;
-  --border-strong: #9eabb8;
+  --border-subtle: #dbe4e7;
+  --border-default: #c3d0d5;
+  --border-strong: #9aaab1;
 
   --brand: var(--color-ieee-600);
   --brand-strong: var(--color-ieee-700);
-  --accent: var(--color-azure-600);
-  --accent-soft: var(--color-azure-300);
-  --emphasis: var(--color-ember-500);
+  --accent: var(--color-trace-700);
+  --accent-bright: var(--color-trace-500);
+  --accent-soft: var(--color-trace-300);
+  --emphasis: var(--color-copper-600);
+  /* The copper that carries text has to be dark enough to read on white;
+     the copper that ends a gradient does not, and is muddy when it is. */
+  --emphasis-bright: var(--color-copper-500);
 
-  /* The hero's glow and grid, kept as tokens so both themes stay coherent. */
-  --glow-primary: color-mix(in oklab, var(--color-ieee-500) 22%, transparent);
-  --glow-secondary: color-mix(in oklab, var(--color-ember-400) 12%, transparent);
-  --grid-line: color-mix(in oklab, var(--color-ieee-900) 7%, transparent);
+  /* --- Board layers ---------------------------------------------------
+     The backdrops on this site are a board seen from above: a grid of
+     through-holes, traces between them, and glows where the board is lit.
+     Keeping them as tokens is what lets both themes stay coherent. */
+  --glow-primary: color-mix(in oklab, var(--color-ieee-500) 20%, transparent);
+  --glow-secondary: color-mix(in oklab, var(--color-copper-400) 12%, transparent);
+  --glow-signal: color-mix(in oklab, var(--color-trace-500) 16%, transparent);
+  --grid-line: color-mix(in oklab, var(--color-ieee-900) 6%, transparent);
+  --via: color-mix(in oklab, var(--color-ieee-800) 18%, transparent);
+  --trace-line: color-mix(in oklab, var(--color-trace-600) 55%, transparent);
+  --pad: color-mix(in oklab, var(--color-copper-500) 60%, transparent);
 
-  --shadow-card: 0 1px 2px rgb(6 19 31 / 0.06), 0 8px 24px -12px rgb(6 19 31 / 0.14);
-  --shadow-lifted: 0 2px 4px rgb(6 19 31 / 0.08), 0 24px 48px -20px rgb(6 19 31 / 0.22);
+  --shadow-card: 0 1px 2px rgb(6 20 24 / 0.06), 0 8px 24px -12px rgb(6 20 24 / 0.14);
+  --shadow-lifted: 0 2px 4px rgb(6 20 24 / 0.08), 0 24px 48px -20px rgb(6 20 24 / 0.22);
 
   --radius-card: 14px;
   --header-height: 4.5rem;
 }
 
 /* Dark theme. Applied by system preference unless the visitor has explicitly
-   chosen light, and by the data attribute when they have chosen dark. */
+   chosen light, and by the data attribute when they have chosen dark.
+   The dark ground is FR-4 substrate rather than neutral black, which is what
+   lets a cyan trace look lit instead of merely coloured. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     color-scheme: dark;
 
-    --surface-base: #060d15;
-    --surface-raised: #0c1823;
-    --surface-sunken: #040a11;
-    --surface-inverted: #f6f8fb;
+    --surface-base: #040d12;
+    --surface-raised: #0a1a21;
+    --surface-sunken: #020809;
+    --surface-inverted: #f4f8f9;
 
-    --text-strong: #f3f7fa;
-    --text-default: #cfdae4;
-    --text-muted: #8fa2b3;
-    --text-faint: #64788a;
+    --text-strong: #eef6f7;
+    --text-default: #c9dadd;
+    --text-muted: #8aa1a7;
+    --text-faint: #5f767d;
     --text-on-brand: #ffffff;
 
-    --border-subtle: #16262f;
-    --border-default: #22394a;
-    --border-strong: #345166;
+    --border-subtle: #13262c;
+    --border-default: #1f3b43;
+    --border-strong: #335f6a;
 
     --brand: var(--color-ieee-400);
     --brand-strong: var(--color-ieee-300);
-    --accent: var(--color-azure-400);
-    --accent-soft: var(--color-azure-300);
-    --emphasis: var(--color-ember-400);
+    --accent: var(--color-trace-400);
+    --accent-bright: var(--color-trace-300);
+    --accent-soft: var(--color-trace-300);
+    --emphasis: var(--color-copper-400);
+    --emphasis-bright: var(--color-copper-300);
 
-    --glow-primary: color-mix(in oklab, var(--color-azure-500) 26%, transparent);
-    --glow-secondary: color-mix(in oklab, var(--color-ember-500) 14%, transparent);
-    --grid-line: color-mix(in oklab, var(--color-azure-300) 9%, transparent);
+    --glow-primary: color-mix(in oklab, var(--color-ieee-500) 24%, transparent);
+    --glow-secondary: color-mix(in oklab, var(--color-copper-500) 14%, transparent);
+    --glow-signal: color-mix(in oklab, var(--color-trace-400) 20%, transparent);
+    --grid-line: color-mix(in oklab, var(--color-trace-300) 8%, transparent);
+    --via: color-mix(in oklab, var(--color-trace-300) 22%, transparent);
+    --trace-line: color-mix(in oklab, var(--color-trace-400) 70%, transparent);
+    --pad: color-mix(in oklab, var(--color-copper-400) 65%, transparent);
 
     --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px -12px rgb(0 0 0 / 0.6);
     --shadow-lifted: 0 2px 4px rgb(0 0 0 / 0.5), 0 24px 48px -20px rgb(0 0 0 / 0.75);
@@ -138,30 +166,36 @@
 :root[data-theme='dark'] {
   color-scheme: dark;
 
-  --surface-base: #060d15;
-  --surface-raised: #0c1823;
-  --surface-sunken: #040a11;
-  --surface-inverted: #f6f8fb;
+  --surface-base: #040d12;
+  --surface-raised: #0a1a21;
+  --surface-sunken: #020809;
+  --surface-inverted: #f4f8f9;
 
-  --text-strong: #f3f7fa;
-  --text-default: #cfdae4;
-  --text-muted: #8fa2b3;
-  --text-faint: #64788a;
+  --text-strong: #eef6f7;
+  --text-default: #c9dadd;
+  --text-muted: #8aa1a7;
+  --text-faint: #5f767d;
   --text-on-brand: #ffffff;
 
-  --border-subtle: #16262f;
-  --border-default: #22394a;
-  --border-strong: #345166;
+  --border-subtle: #13262c;
+  --border-default: #1f3b43;
+  --border-strong: #335f6a;
 
   --brand: var(--color-ieee-400);
   --brand-strong: var(--color-ieee-300);
-  --accent: var(--color-azure-400);
-  --accent-soft: var(--color-azure-300);
-  --emphasis: var(--color-ember-400);
+  --accent: var(--color-trace-400);
+  --accent-bright: var(--color-trace-300);
+  --accent-soft: var(--color-trace-300);
+  --emphasis: var(--color-copper-400);
+  --emphasis-bright: var(--color-copper-300);
 
-  --glow-primary: color-mix(in oklab, var(--color-azure-500) 26%, transparent);
-  --glow-secondary: color-mix(in oklab, var(--color-ember-500) 14%, transparent);
-  --grid-line: color-mix(in oklab, var(--color-azure-300) 9%, transparent);
+  --glow-primary: color-mix(in oklab, var(--color-ieee-500) 24%, transparent);
+  --glow-secondary: color-mix(in oklab, var(--color-copper-500) 14%, transparent);
+  --glow-signal: color-mix(in oklab, var(--color-trace-400) 20%, transparent);
+  --grid-line: color-mix(in oklab, var(--color-trace-300) 8%, transparent);
+  --via: color-mix(in oklab, var(--color-trace-300) 22%, transparent);
+  --trace-line: color-mix(in oklab, var(--color-trace-400) 70%, transparent);
+  --pad: color-mix(in oklab, var(--color-copper-400) 65%, transparent);
 
   --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px -12px rgb(0 0 0 / 0.6);
   --shadow-lifted: 0 2px 4px rgb(0 0 0 / 0.5), 0 24px 48px -20px rgb(0 0 0 / 0.75);
@@ -184,8 +218,10 @@
   --color-brand: var(--brand);
   --color-brand-strong: var(--brand-strong);
   --color-accent: var(--accent);
+  --color-accent-bright: var(--accent-bright);
   --color-accent-soft: var(--accent-soft);
   --color-emphasis: var(--emphasis);
+  --color-emphasis-bright: var(--emphasis-bright);
 
   --color-subtle: var(--border-subtle);
   --color-line: var(--border-default);

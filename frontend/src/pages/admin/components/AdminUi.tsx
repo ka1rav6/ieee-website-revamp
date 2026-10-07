@@ -485,7 +485,7 @@ export function StatusPill({
   const styles = {
     live: 'border-[color-mix(in_oklab,var(--color-signal-400)_45%,transparent)] text-[var(--color-signal-400)]',
     draft:
-      'border-[color-mix(in_oklab,var(--color-ember-400)_45%,transparent)] text-[var(--color-ember-400)]',
+      'border-[color-mix(in_oklab,var(--color-copper-400)_45%,transparent)] text-[var(--color-copper-400)]',
     muted: 'border-[var(--border-default)] text-muted',
   }[tone];
 
