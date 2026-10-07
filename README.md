@@ -446,21 +446,45 @@ migrations so that staying compatible one version back is always possible.
 
 ## Design notes
 
-**Palette.** Built from IEEE's brand blue (`#00629B`) but deliberately not
-limited to it: a brighter azure carries interaction and focus, and a warm
-amber carries emphasis. An all-blue page has nowhere for the eye to land.
-Tokens live in `frontend/src/styles/theme.css`.
+**Palette.** Built from IEEE's brand blue (`#00629B`) and then taken
+somewhere specific: a printed circuit board. Blue stays the brand and carries
+primary actions, but the colours doing the everyday work are the ones you
+find on a board — a teal-cyan "trace" for interaction and focus, copper for
+emphasis, solder green for status. An all-blue page has nowhere for the eye
+to land. The dark ground is FR-4 substrate rather than neutral black, which
+is what lets a cyan trace read as lit rather than merely coloured. Tokens
+live in `frontend/src/styles/theme.css`.
 
 **Themes.** Light and dark both ship. The palette is defined on bare `:root`
 so a value always exists; dark redefines only what changes, under both a
 media query and a `data-theme` attribute, so the toggle wins in either
 direction and the system preference is the default.
 
-**Motion.** The hero's circuit traces and glows are SVG and CSS animations,
-not a JavaScript loop, so they cost nothing per frame. Scroll reveals use
-`whileInView` with `once`, so nothing replays on the way back up. Everything
-respects `prefers-reduced-motion`: the stylesheet collapses durations
-globally and components check the same preference before animating.
+**Motion.** Two kinds, kept apart. *Entrances* (`components/ui/Reveal.tsx`)
+fire once when an element is first seen — a spring-driven lift with a blur
+resolving alongside it, so a card reads as coming into focus rather than
+sliding into place — and use `whileInView` with `once`, so nothing replays on
+the way back up. *Scroll-linked* motion (`hooks/useScrollMotion.ts`,
+`components/ui/Scroll.tsx`) is a continuous function of scroll position
+rather than of elapsed time: backdrop layers at three depths in the hero, the
+glow inside a panel, and the one statement on the landing page that lights a
+word at a time as it is read. Raw scroll arrives unevenly, so progress goes
+through a light spring before it reaches a transform — that is what makes it
+read as smooth. The section dividers' pulses use `animation-timeline: view()`
+where the browser has it, which runs off the main thread, and are a plain
+hairline where it does not. The hero's traces and glows are SVG and CSS with
+no JavaScript loop, and the pointer lighting the board under the cursor is a
+mask driven by two custom properties. Everything respects
+`prefers-reduced-motion`: the stylesheet collapses durations globally and
+every component checks the same preference before animating — the
+scroll-linked ones skip their measurement entirely rather than measuring and
+discarding the result.
+
+**Interaction.** Cards lean toward the pointer, the primary call to action
+leans back, the nav's marker travels between items instead of each item
+fading its own in, and a back-to-top control carries the page position as a
+ring. All of it is inert on touch, where there is no hover to answer and a
+transform under a finger only fights the scroll.
 
 **Accessibility.** Semantic landmarks and one `h1` per page; every control
 labelled; visible focus rings everywhere; status conveyed by icon or word as
@@ -468,8 +492,9 @@ well as colour; dialogs trap focus and restore it on close; the first tab
 stop is a skip link.
 
 **Performance.** Routes are lazily loaded and the vendor bundle is split, so
-the landing page ships about 145 KB gzipped and the entire dashboard (18 KB
-gzipped) is never downloaded by a visitor reading a blog post. The 143
+the landing page ships about 167 KB gzipped — React 68, Motion 45, the app
+26, the router 14, CSS 16 — and the entire dashboard (18 KB gzipped) is never
+downloaded by a visitor reading a blog post. The 143
 imported images were re-encoded to WebP at display sizes, taking 94 MB of
 originals down to 6.9 MB.
 
