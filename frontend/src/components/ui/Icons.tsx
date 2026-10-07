@@ -66,6 +66,12 @@ export const ArrowLeftIcon = (props: IconProps) => (
   </Svg>
 );
 
+export const ArrowUpIcon = (props: IconProps) => (
+  <Svg {...props}>
+    <path d="M12 19V5M6 11l6-6 6 6" />
+  </Svg>
+);
+
 export const ArrowUpRightIcon = (props: IconProps) => (
   <Svg {...props}>
     <path d="M7 17 17 7M9 7h8v8" />

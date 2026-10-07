@@ -7,7 +7,7 @@
  */
 
 import { useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useEscapeKey, useScrollLock, useScrolledPast } from '@/hooks/useInteraction';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
@@ -58,8 +58,63 @@ function ThemeToggle() {
 
 function navLinkClass({ isActive }: { isActive: boolean }): string {
   return cx(
-    'relative px-3 py-2 text-sm font-medium transition-colors duration-200',
+    'relative block px-3 py-2 text-sm font-medium transition-colors duration-200',
     isActive ? 'text-strong' : 'text-muted hover:text-strong',
+  );
+}
+
+/**
+ * The primary navigation.
+ *
+ * Two markers, both shared layout animations: a bar under the current page,
+ * and a panel that slides to whichever item the pointer or keyboard focus is
+ * on. Because they are `layoutId`s rather than per-item transitions, one
+ * marker travels between items instead of each item fading its own in and
+ * out - which is what makes the nav feel like a single control.
+ */
+function PrimaryNav() {
+  const reducedMotion = useReducedMotion();
+  const [focused, setFocused] = useState<string | null>(null);
+
+  return (
+    <nav aria-label="Primary" className="hidden lg:block">
+      <ul className="flex items-center gap-0.5" onMouseLeave={() => setFocused(null)}>
+        {NAV_LINKS.map((item) => (
+          <li
+            key={item.to}
+            onMouseEnter={() => setFocused(item.to)}
+            // Keyboard focus moves the marker too, so tabbing through the nav
+            // shows the same affordance a pointer does.
+            onFocus={() => setFocused(item.to)}
+            onBlur={() => setFocused(null)}
+          >
+            <NavLink to={item.to} className={navLinkClass}>
+              {({ isActive }) => (
+                <>
+                  {!reducedMotion && focused === item.to && (
+                    <motion.span
+                      layoutId="nav-hover"
+                      className="absolute inset-0 rounded-lg bg-[color-mix(in_oklab,var(--accent)_11%,transparent)]"
+                      transition={{ type: 'spring', visualDuration: 0.25, bounce: 0.18 }}
+                    />
+                  )}
+                  <span className="relative">{item.label}</span>
+                  {/* The active marker is a bar under the label, not just
+                      a colour change. */}
+                  {isActive && (
+                    <motion.span
+                      layoutId="nav-active"
+                      className="absolute inset-x-3 -bottom-px h-0.5 rounded-full bg-accent"
+                      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                    />
+                  )}
+                </>
+              )}
+            </NavLink>
+          </li>
+        ))}
+      </ul>
+    </nav>
   );
 }
 
@@ -101,30 +156,7 @@ export function Header() {
       <div className="shell flex h-[var(--header-height)] items-center justify-between gap-4">
         <Brand compact />
 
-        <nav aria-label="Primary" className="hidden lg:block">
-          <ul className="flex items-center gap-0.5">
-            {NAV_LINKS.map((item) => (
-              <li key={item.to}>
-                <NavLink to={item.to} className={navLinkClass}>
-                  {({ isActive }) => (
-                    <>
-                      {item.label}
-                      {/* The active marker is a bar under the label, not just
-                          a colour change. */}
-                      {isActive && (
-                        <motion.span
-                          layoutId="nav-active"
-                          className="absolute inset-x-3 -bottom-px h-0.5 rounded-full bg-accent"
-                          transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                        />
-                      )}
-                    </>
-                  )}
-                </NavLink>
-              </li>
-            ))}
-          </ul>
-        </nav>
+        <PrimaryNav />
 
         <div className="flex items-center gap-2">
           <ThemeToggle />

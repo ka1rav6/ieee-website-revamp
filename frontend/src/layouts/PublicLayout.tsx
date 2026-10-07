@@ -11,6 +11,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
+import { BackToTop } from '@/components/ui/Interactive';
 
 /**
  * Jump to the top on navigation, but leave in-page anchors alone so a link
@@ -58,6 +59,10 @@ export function PublicLayout() {
       </main>
 
       <Footer />
+
+      {/* In the frame rather than on each page, so it is present on every
+          route without nine copies of the same button. */}
+      <BackToTop />
     </div>
   );
 }
