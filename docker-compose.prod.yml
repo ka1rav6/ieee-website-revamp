@@ -21,6 +21,9 @@ services:
       SECRET_KEY: ${SECRET_KEY:?SECRET_KEY must be set}
       ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-720}
       CORS_ORIGINS: ${CORS_ORIGINS:-}
+      # Reverse proxies allowed to set X-Forwarded-For; empty when the app is
+      # exposed directly.
+      TRUSTED_PROXIES: ${TRUSTED_PROXIES:-}
       # Inside the compose network Postgres is reachable by service name.
       POSTGRES_USER: ${POSTGRES_USER:-ieee}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ieee-local-dev-password}

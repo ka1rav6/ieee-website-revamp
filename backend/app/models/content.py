@@ -382,6 +382,9 @@ class SiteSetting(Base, TimestampMixin):
 
     Used for page intros, the join-form URL, social links and similar, so the
     admin can change copy without a developer touching React.
+
+    Every value is served publicly by `GET /api/v1/settings`, so this table must
+    never hold a secret, credential or anything not meant to be world-readable.
     """
 
     __tablename__ = "site_settings"

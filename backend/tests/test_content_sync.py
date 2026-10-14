@@ -190,6 +190,28 @@ def test_ieee_day_children_are_imported(db: Session, content_dir: Path):
     assert [h.title for h in edition.highlights] == ["Keynote"]
 
 
+def test_editing_an_ieee_day_stat_value_reimports(db: Session, content_dir: Path):
+    """Regression: replacing stats on re-import used to insert the new rows
+    before deleting the old, tripping the unique (edition_id, label)
+    constraint whenever a stat label was kept."""
+    ContentSync(db, content_dir).import_all()
+
+    (content_dir / "ieee-day.yaml").write_text(
+        "- year: 2026\n"
+        "  theme: A Theme\n"
+        "  is_current: true\n"
+        "  stats:\n"
+        "    - label: Participants\n      value: '500'\n"
+        "  highlights:\n"
+        "    - title: Keynote\n      description: A talk.\n"
+    )
+    report = ContentSync(db, content_dir).import_all()
+
+    edition = db.scalar(select(IeeeDayEdition))
+    assert [(s.label, s.value) for s in edition.stats] == [("Participants", "500")]
+    assert report.updated.get("ieee day") == 1
+
+
 def test_dry_run_changes_nothing(db: Session, content_dir: Path):
     report = ContentSync(db, content_dir).import_all(dry_run=True)
 
@@ -486,3 +508,198 @@ def test_an_empty_blog_table_does_not_empty_the_blogs_directory(
     # decision to delete every article, so the files stay put.
     assert (destination / "blogs" / "an-article.md").is_file()
     assert (destination / "blogs" / "a-draft.md").is_file()
+
+
+# ---------------------------------------------------------------------------
+# Duplicate slugs within one file
+#
+# A content file is a set of entries keyed by slug. Two entries that derive the
+# same slug used to insert a duplicate and blow up on the unique index (or, on
+# a session with autoflush, silently collapse into one row). Each importer now
+# disambiguates repeats so every entry gets its own stable slug.
+# ---------------------------------------------------------------------------
+
+
+def test_duplicate_team_names_get_distinct_slugs(db: Session, content_dir: Path):
+    (content_dir / "team.yaml").write_text(
+        "- name: Same Person\n  category: core\n- name: Same Person\n  category: executive\n"
+    )
+
+    report = ContentSync(db, content_dir).import_all()
+
+    slugs = sorted(m.slug for m in db.scalars(select(TeamMember)).all())
+    assert slugs == ["same-person", "same-person-2"]
+    assert report.created.get("team member") == 2
+
+
+def test_duplicate_alumni_names_get_distinct_slugs(db: Session, content_dir: Path):
+    (content_dir / "alumni.yaml").write_text(
+        "- name: Same Alum\n  graduation_year: 2023\n- name: Same Alum\n  graduation_year: 2024\n"
+    )
+
+    ContentSync(db, content_dir).import_all()
+
+    slugs = sorted(a.slug for a in db.scalars(select(Alumnus)).all())
+    assert slugs == ["same-alum", "same-alum-2"]
+
+
+def test_duplicate_collaboration_names_get_distinct_slugs(db: Session, content_dir: Path):
+    (content_dir / "collaborations.yaml").write_text(
+        "- name: Acme\n  year: 2024\n- name: Acme\n  year: 2025\n"
+    )
+
+    ContentSync(db, content_dir).import_all()
+
+    slugs = sorted(c.slug for c in db.scalars(select(Collaboration)).all())
+    assert slugs == ["acme", "acme-2"]
+
+
+def test_duplicate_blog_category_names_get_distinct_slugs(db: Session, content_dir: Path):
+    (content_dir / "blogs" / "categories.yaml").write_text(
+        "- name: Tech Affairs\n- name: Tech Affairs\n"
+    )
+
+    ContentSync(db, content_dir).import_all()
+
+    slugs = sorted(c.slug for c in db.scalars(select(BlogCategory)).all())
+    assert slugs == ["tech-affairs", "tech-affairs-2"]
+
+
+def test_explicit_duplicate_slugs_in_a_file_are_still_kept_distinct(db: Session, content_dir: Path):
+    (content_dir / "team.yaml").write_text(
+        "- name: Alpha\n  category: core\n  slug: person\n"
+        "- name: Beta\n  category: core\n  slug: person\n"
+    )
+
+    ContentSync(db, content_dir).import_all()
+
+    slugs = sorted(m.slug for m in db.scalars(select(TeamMember)).all())
+    assert slugs == ["person", "person-2"]
+
+
+def test_duplicate_post_frontmatter_slugs_get_distinct_urls(db: Session, content_dir: Path):
+    (content_dir / "blogs" / "one.md").write_text(
+        "---\ntitle: One\nslug: shared\nauthor: A\n---\n\nFirst body.\n"
+    )
+    (content_dir / "blogs" / "two.md").write_text(
+        "---\ntitle: Two\nslug: shared\nauthor: A\n---\n\nSecond body.\n"
+    )
+
+    ContentSync(db, content_dir).import_all()
+
+    slugs = {p.slug for p in db.scalars(select(BlogPost)).all()}
+    assert {"shared", "shared-2"} <= slugs
+
+
+def test_duplicate_event_titles_in_the_same_year_get_distinct_slugs(db: Session, content_dir: Path):
+    """Regression: two same-title events in one year both got `-<year>` and
+    collided."""
+    (content_dir / "events.yaml").write_text(
+        "- title: Slash\n  date: 2026-03-13\n- title: Slash\n  date: 2026-09-01\n"
+    )
+
+    ContentSync(db, content_dir).import_all()
+
+    slugs = sorted(e.slug for e in db.scalars(select(Event)).all())
+    assert slugs == ["slash", "slash-2026"]
+
+
+def test_a_third_duplicate_event_falls_back_to_a_counter(db: Session, content_dir: Path):
+    (content_dir / "events.yaml").write_text(
+        "- title: Slash\n  date: 2026-03-13\n"
+        "- title: Slash\n  date: 2026-09-01\n"
+        "- title: Slash\n  date: 2026-11-01\n"
+    )
+
+    ContentSync(db, content_dir).import_all()
+
+    slugs = sorted(e.slug for e in db.scalars(select(Event)).all())
+    assert slugs == ["slash", "slash-2026", "slash-2026-2"]
+
+
+def test_duplicate_events_without_a_date_still_get_distinct_slugs(db: Session, content_dir: Path):
+    (content_dir / "events.yaml").write_text("- title: Repeat\n- title: Repeat\n")
+
+    ContentSync(db, content_dir).import_all()
+
+    slugs = sorted(e.slug for e in db.scalars(select(Event)).all())
+    assert slugs == ["repeat", "repeat-2"]
+
+
+def test_events_sharing_a_title_across_three_years_use_each_year(db: Session, content_dir: Path):
+    (content_dir / "events.yaml").write_text(
+        "- title: Slash\n  date: 2026-03-13\n"
+        "- title: Slash\n  date: 2023-04-19\n"
+        "- title: Slash\n  date: 2024-05-01\n"
+    )
+
+    ContentSync(db, content_dir).import_all()
+
+    slugs = sorted(e.slug for e in db.scalars(select(Event)).all())
+    assert slugs == ["slash", "slash-2023", "slash-2024"]
+
+
+def test_a_duplicate_slug_still_respects_the_column_length(db: Session, content_dir: Path):
+    # The longest a name may be; its slug fills the 160-char column, so the
+    # disambiguating suffix has to be trimmed in rather than appended past it.
+    long_name = "a" * 160
+    (content_dir / "team.yaml").write_text(
+        f"- name: '{long_name}'\n  category: core\n- name: '{long_name}'\n  category: core\n"
+    )
+
+    ContentSync(db, content_dir).import_all()
+
+    slugs = [m.slug for m in db.scalars(select(TeamMember)).all()]
+    assert len(slugs) == 2
+    assert len(set(slugs)) == 2
+    assert all(len(slug) <= 160 for slug in slugs)
+
+
+def test_a_name_with_no_usable_characters_still_gets_a_slug(db: Session, content_dir: Path):
+    (content_dir / "team.yaml").write_text("- name: '!!!'\n  category: core\n")
+
+    ContentSync(db, content_dir).import_all()
+
+    assert db.scalar(select(TeamMember)).slug == "item"
+
+
+def test_reimporting_a_file_with_duplicates_is_idempotent(db: Session, content_dir: Path):
+    (content_dir / "team.yaml").write_text(
+        "- name: Same\n  category: core\n- name: Same\n  category: mentor\n"
+    )
+    sync = ContentSync(db, content_dir)
+    sync.import_all()
+
+    second = sync.import_all()
+
+    assert second.created == {}
+    assert second.updated == {}
+    assert second.deleted == {}
+    assert second.unchanged.get("team member") == 2
+
+
+def test_prune_keeps_every_duplicate_rather_than_dropping_one(db: Session, content_dir: Path):
+    (content_dir / "team.yaml").write_text(
+        "- name: Same\n  category: core\n- name: Same\n  category: mentor\n"
+    )
+
+    report = ContentSync(db, content_dir).import_all(prune=True)
+
+    assert len(db.scalars(select(TeamMember)).all()) == 2
+    assert report.deleted.get("team member") is None
+
+
+def test_duplicate_rows_survive_an_export_and_reimport(
+    db: Session, content_dir: Path, tmp_path: Path
+):
+    (content_dir / "team.yaml").write_text(
+        "- name: Same\n  category: core\n- name: Same\n  category: mentor\n"
+    )
+    ContentSync(db, content_dir).import_all()
+    destination = tmp_path / "exported"
+    ContentSync(db, destination).export_all()
+
+    report = ContentSync(db, destination).import_all()
+
+    assert report.created == {}
+    assert report.updated == {}

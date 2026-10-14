@@ -131,6 +131,42 @@ def _apply(record: Any, values: dict[str, Any]) -> bool:
     return changed
 
 
+def _unique_slug(
+    candidate: str,
+    taken: set[str],
+    *,
+    hint: object | None = None,
+    max_length: int = 200,
+) -> str:
+    """A slug that is unique among the entries already seen in this file.
+
+    Content files are authoritative and re-imported as a set, so a slug only
+    has to be unique *within the file*: checking the database instead would
+    make a repeated import renumber rows and stop being idempotent. The first
+    occurrence keeps the plain slug; a repeat is disambiguated by an optional
+    hint (an event's year), then by a counter, so two entries can never resolve
+    to the same slug and collide on the unique index.
+    """
+    base = candidate or "item"
+    if base not in taken:
+        return base
+
+    stems = []
+    if hint is not None:
+        stems.append(f"{base[: max_length - len(str(hint)) - 1]}-{hint}")
+    stems.append(base)
+
+    for stem in stems:
+        if stem not in taken:
+            return stem
+        for suffix in range(2, 1000):
+            numbered = f"{stem[: max_length - len(str(suffix)) - 1]}-{suffix}"
+            if numbered not in taken:
+                return numbered
+
+    raise ContentError(f"Could not derive a unique slug from {candidate!r}")
+
+
 # The addressable slices of the content tree, in the order they must be
 # imported: blog posts reference categories, so `blogs` covers both and comes
 # before anything that could depend on it.
@@ -268,7 +304,9 @@ class ContentSync:
         seen: set[str] = set()
         for index, raw in enumerate(entries, start=1):
             item = _validate(BlogCategoryFile, raw, self.paths.blog_categories.name, index)
-            slug = slugify(item.slug or item.name, max_length=120)
+            slug = _unique_slug(
+                slugify(item.slug or item.name, max_length=120), seen, max_length=120
+            )
             seen.add(slug)
             values = {
                 "name": item.name,
@@ -294,8 +332,11 @@ class ContentSync:
             meta, body = split_frontmatter(path.read_text(encoding="utf-8"), source=path.name)
             item = _validate(BlogPostFile, meta, path.name)
             # The filename is the canonical slug, so renaming a file renames
-            # the URL and nothing else has to be kept in step.
-            slug = slugify(item.slug or path.stem, max_length=220)
+            # the URL and nothing else has to be kept in step. A frontmatter
+            # slug that repeats another post is still kept distinct.
+            slug = _unique_slug(
+                slugify(item.slug or path.stem, max_length=220), seen, max_length=220
+            )
             seen.add(slug)
 
             category = None
@@ -366,7 +407,9 @@ class ContentSync:
         seen: set[str] = set()
         for index, raw in enumerate(entries, start=1):
             item = _validate(TeamMemberFile, raw, self.paths.team.name, index)
-            slug = slugify(item.slug or item.name, max_length=160)
+            slug = _unique_slug(
+                slugify(item.slug or item.name, max_length=160), seen, max_length=160
+            )
             seen.add(slug)
             values = {
                 "name": item.name,
@@ -402,7 +445,9 @@ class ContentSync:
         seen: set[str] = set()
         for index, raw in enumerate(entries, start=1):
             item = _validate(AlumnusFile, raw, self.paths.alumni.name, index)
-            slug = slugify(item.slug or item.name, max_length=160)
+            slug = _unique_slug(
+                slugify(item.slug or item.name, max_length=160), seen, max_length=160
+            )
             seen.add(slug)
             values = {
                 "name": item.name,
@@ -435,7 +480,9 @@ class ContentSync:
         seen: set[str] = set()
         for index, raw in enumerate(entries, start=1):
             item = _validate(CollaborationFile, raw, self.paths.collaborations.name, index)
-            slug = slugify(item.slug or item.name, max_length=160)
+            slug = _unique_slug(
+                slugify(item.slug or item.name, max_length=160), seen, max_length=160
+            )
             seen.add(slug)
             values = {
                 "name": item.name,
@@ -465,13 +512,15 @@ class ContentSync:
         seen: set[str] = set()
         for index, raw in enumerate(entries, start=1):
             item = _validate(EventFile, raw, self.paths.events.name, index)
-            slug = slugify(item.slug or item.title, max_length=220)
-            if slug in seen:
-                # Several events share a title across years (Slash, Xgrid),
-                # so disambiguate with the year rather than silently
-                # overwriting the earlier one.
-                suffix = item.date.year if item.date else index
-                slug = f"{slug}-{suffix}"
+            # Several events share a title across years (Slash, Xgrid), so a
+            # repeat slug is disambiguated with the year - and then with a
+            # counter, since a title can repeat within one year too.
+            slug = _unique_slug(
+                slugify(item.slug or item.title, max_length=220),
+                seen,
+                hint=item.date.year if item.date else index,
+                max_length=220,
+            )
             seen.add(slug)
             values = {
                 "title": item.title,
@@ -540,6 +589,17 @@ class ContentSync:
                 != [(g.image, g.caption) for g in item.gallery]
             )
             if children_changed:
+                # Clear and flush before adding the replacements, so the
+                # DELETEs reach the database before the INSERTs. A stat keeps
+                # its label across an edit, so inserting the new row before the
+                # old one is deleted would trip the (edition_id, label) unique
+                # constraint. A newly created edition has nothing to order.
+                edition.highlights = []
+                edition.stats = []
+                edition.gallery = []
+                if edition.id is not None:
+                    self.db.flush()
+
                 edition.highlights = [
                     IeeeDayHighlight(
                         title=h.title, description=h.description, image=h.image, sort_order=i

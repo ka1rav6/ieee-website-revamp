@@ -7,6 +7,7 @@ environment variables. No secret ever has a usable default.
 from __future__ import annotations
 
 import functools
+import ipaddress
 from pathlib import Path
 from typing import Literal
 
@@ -33,6 +34,10 @@ def _default_content_dir() -> Path:
 Environment = Literal["development", "test", "production"]
 EmailBackend = Literal["console", "smtp", "none"]
 
+# Paired with the default SECRET_KEY: values that are fine locally but must
+# never reach production, where they are refused at startup (see main.py).
+INSECURE_DEFAULT_POSTGRES_PASSWORD = "ieee-local-dev-password"
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
@@ -51,13 +56,17 @@ class Settings(BaseSettings):
     secret_key: str = Field(min_length=16, default="insecure-development-key-change-me")
     access_token_expire_minutes: int = Field(default=720, gt=0)
     cors_origins: str = ""
+    # Comma-separated IPs/CIDRs of reverse proxies whose X-Forwarded-For may be
+    # trusted. Empty means the header is ignored and the socket address is
+    # used, which is the safe default when the app is exposed directly.
+    trusted_proxies: str = ""
     login_rate_limit_attempts: int = Field(default=5, gt=0)
     login_rate_limit_window_seconds: int = Field(default=900, gt=0)
 
     # --- Database ---
     database_url: str | None = None
     postgres_user: str = "ieee"
-    postgres_password: str = "ieee-local-dev-password"
+    postgres_password: str = INSECURE_DEFAULT_POSTGRES_PASSWORD
     postgres_db: str = "ieee"
     postgres_host: str = "localhost"
     postgres_port: int = 5432
@@ -69,6 +78,9 @@ class Settings(BaseSettings):
     # --- Uploads ---
     upload_dir: Path = Path("./uploads")
     max_upload_size_mb: int = Field(default=5, gt=0, le=50)
+    # Cap on any request body, enforced before it is read into memory. Kept
+    # above the upload limit so image uploads still fit.
+    max_request_body_mb: int = Field(default=10, gt=0, le=100)
 
     # --- Static frontend (production image only) ---
     static_dir: Path | None = None
@@ -91,6 +103,21 @@ class Settings(BaseSettings):
     def _strip_trailing_slash(cls, value: str) -> str:
         return value.rstrip("/")
 
+    @field_validator("trusted_proxies")
+    @classmethod
+    def _trusted_proxies_are_valid(cls, value: str) -> str:
+        # Reject a malformed entry at startup rather than silently trusting
+        # nothing (or everything) at request time.
+        for entry in value.split(","):
+            entry = entry.strip()
+            if not entry:
+                continue
+            try:
+                ipaddress.ip_network(entry)
+            except ValueError as exc:
+                raise ValueError(f"{entry!r} is not a valid IP address or CIDR") from exc
+        return value
+
     @computed_field
     @property
     def is_production(self) -> bool:
@@ -110,6 +137,18 @@ class Settings(BaseSettings):
         return (
             f"postgresql+psycopg://{self.postgres_user}:{self.postgres_password}"
             f"@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
+        )
+
+    @property
+    def trusted_proxy_networks(
+        self,
+    ) -> tuple[ipaddress.IPv4Network | ipaddress.IPv6Network, ...]:
+        """The configured proxies, parsed. Plain property: network objects are
+        not JSON-serialisable like the computed fields are."""
+        return tuple(
+            ipaddress.ip_network(entry.strip())
+            for entry in self.trusted_proxies.split(",")
+            if entry.strip()
         )
 
     @computed_field
@@ -142,6 +181,11 @@ class Settings(BaseSettings):
     @property
     def max_upload_size_bytes(self) -> int:
         return self.max_upload_size_mb * 1024 * 1024
+
+    @computed_field
+    @property
+    def max_request_body_bytes(self) -> int:
+        return self.max_request_body_mb * 1024 * 1024
 
 
 @functools.lru_cache

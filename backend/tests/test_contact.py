@@ -48,6 +48,26 @@ def test_the_email_is_stored_lowercased(client, db: Session):
     assert stored.email == "mixedcase@example.com"
 
 
+def test_a_long_forwarded_for_header_is_rejected_not_stored(client, db: Session):
+    """Regression: an over-long X-Forwarded-For used to overflow source_ip
+    (VARCHAR(64)) and turn the submission into a 500."""
+    response = client.post(CONTACT, json=VALID, headers={"X-Forwarded-For": "1" * 200})
+
+    assert response.status_code == 201
+    stored = db.scalar(select(ContactSubmission))
+    assert stored.source_ip is not None
+    assert len(stored.source_ip) <= 64
+
+
+def test_a_forwarded_header_is_ignored_unless_the_peer_is_trusted(client, db: Session):
+    """X-Forwarded-For is attacker-controlled, so an untrusted client cannot
+    choose the address recorded or the one the rate limiter keys on."""
+    client.post(CONTACT, json=VALID, headers={"X-Forwarded-For": "203.0.113.9"})
+
+    stored = db.scalar(select(ContactSubmission))
+    assert stored.source_ip != "203.0.113.9"
+
+
 def test_a_collaboration_enquiry_records_its_type(client, db: Session):
     client.post(
         CONTACT,
@@ -133,6 +153,20 @@ def test_repeated_submissions_are_rate_limited(client, db: Session):
 
     assert blocked.status_code == 429
     assert "Retry-After" in blocked.headers
+    assert len(db.scalars(select(ContactSubmission)).all()) == 5
+
+
+def test_spoofed_forwarded_headers_cannot_evade_the_rate_limit(client, db: Session):
+    """Regression: a fresh X-Forwarded-For used to reset the limiter key. With
+    no trusted proxy configured, every spoofed address maps to the real peer,
+    so the sixth attempt is still throttled."""
+    for index in range(5):
+        sent = client.post(CONTACT, json=VALID, headers={"X-Forwarded-For": f"203.0.113.{index}"})
+        assert sent.status_code == 201
+
+    blocked = client.post(CONTACT, json=VALID, headers={"X-Forwarded-For": "198.51.100.1"})
+
+    assert blocked.status_code == 429
     assert len(db.scalars(select(ContactSubmission)).all()) == 5
 
 

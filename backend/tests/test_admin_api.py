@@ -516,6 +516,46 @@ def test_admin_can_create_an_ieee_day_edition(client, auth_headers):
     assert len(body["gallery"]) == 1
 
 
+def test_editing_an_ieee_day_edition_can_reuse_stat_labels(client, auth_headers):
+    """Regression: replacing stats used to insert before deleting, which
+    violated the unique (edition_id, label) constraint on the second save."""
+    first = client.put(
+        "/api/v1/admin/ieee-day/2026",
+        headers=auth_headers,
+        json={
+            "year": 2026,
+            "is_current": True,
+            "stats": [{"label": "Participants", "value": "450"}],
+            "highlights": [{"title": "Keynote"}],
+            "gallery": [{"image": "/uploads/a.webp"}],
+        },
+    )
+    assert first.status_code == 200, first.text
+
+    second = client.put(
+        "/api/v1/admin/ieee-day/2026",
+        headers=auth_headers,
+        json={
+            "year": 2026,
+            "is_current": True,
+            "stats": [
+                {"label": "Participants", "value": "500"},
+                {"label": "Speakers", "value": "12"},
+            ],
+            "highlights": [{"title": "Keynote"}, {"title": "Panel"}],
+            "gallery": [{"image": "/uploads/a.webp"}],
+        },
+    )
+
+    assert second.status_code == 200, second.text
+    body = second.json()
+    assert {s["label"]: s["value"] for s in body["stats"]} == {
+        "Participants": "500",
+        "Speakers": "12",
+    }
+    assert [h["title"] for h in body["highlights"]] == ["Keynote", "Panel"]
+
+
 def test_ieee_day_edition_lists_its_tagged_events(client, auth_headers, db: Session):
     make_event(db, slug="ieee-day-talk", ieee_day_year=2026)
     make_event(db, slug="unrelated-event", ieee_day_year=None)
@@ -613,6 +653,28 @@ def test_admin_can_triage_a_submission(client, auth_headers):
     assert response.json()["admin_notes"] == "Answered by email."
 
 
+def test_a_submission_status_cannot_be_cleared(client, auth_headers):
+    """Regression: PATCHing status:null used to violate the NOT NULL column
+    and surface as a 500."""
+    created = client.post(
+        "/api/v1/contact",
+        json={
+            "name": "A Sender",
+            "email": "null-status@example.com",
+            "message": "This message is definitely long enough to pass validation.",
+        },
+    ).json()
+
+    response = client.patch(
+        f"/api/v1/admin/submissions/{created['id']}",
+        headers=auth_headers,
+        json={"status": None},
+    )
+
+    assert response.status_code == 422
+    assert "status" in response.json()["fields"]
+
+
 def test_admin_can_update_site_settings_and_they_become_public(client, auth_headers):
     response = client.put(
         "/api/v1/admin/settings",
@@ -631,3 +693,15 @@ def test_updating_settings_leaves_other_keys_alone(client, auth_headers):
     public = client.get("/api/v1/settings").json()
     assert public["keep"] == "this"
     assert public["add"] == "that"
+
+
+def test_an_over_long_setting_key_is_rejected(client, auth_headers):
+    """Regression: a key longer than the column used to fail with a 500."""
+    response = client.put(
+        "/api/v1/admin/settings",
+        headers=auth_headers,
+        json={"values": {"k" * 200: "v"}},
+    )
+
+    assert response.status_code == 422
+    assert "values" in response.json()["fields"]

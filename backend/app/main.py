@@ -21,9 +21,13 @@ from starlette.responses import Response
 
 from app.api import seo
 from app.api.v1 import api_router
-from app.core.config import Settings, settings
+from app.core.config import (
+    INSECURE_DEFAULT_POSTGRES_PASSWORD,
+    Settings,
+    settings,
+)
 from app.core.errors import register_exception_handlers
-from app.core.middleware import SecurityHeadersMiddleware
+from app.core.middleware import MaxBodySizeMiddleware, SecurityHeadersMiddleware
 
 logging.basicConfig(
     level=logging.INFO,
@@ -45,17 +49,26 @@ def check_production_config(cfg: Settings) -> list[str]:
     """Configuration mistakes that must not reach production.
 
     Returned rather than raised so the caller decides whether to warn or
-    refuse to start.
+    refuse to start. The environment-specific checks are only reported for
+    production, so a normal development setup stays quiet.
     """
     problems: list[str] = []
     if cfg.secret_key == INSECURE_DEFAULT_SECRET:
         problems.append("SECRET_KEY is still the development default. Run `just secret`.")
     if len(cfg.secret_key) < 32:
         problems.append("SECRET_KEY should be at least 32 characters.")
-    if cfg.site_url.startswith("http://") and "localhost" not in cfg.site_url:
-        problems.append("SITE_URL should use https:// in production.")
     if cfg.email_backend == "smtp" and not cfg.smtp_host:
         problems.append("EMAIL_BACKEND is 'smtp' but SMTP_HOST is empty.")
+
+    if cfg.is_production:
+        if "localhost" in cfg.site_url or "127.0.0.1" in cfg.site_url:
+            problems.append("SITE_URL still points at localhost. Set the public https URL.")
+        elif cfg.site_url.startswith("http://"):
+            problems.append("SITE_URL should use https:// in production.")
+        if cfg.database_url is None and cfg.postgres_password == INSECURE_DEFAULT_POSTGRES_PASSWORD:
+            problems.append("POSTGRES_PASSWORD is still the development default.")
+        if cfg.access_token_expire_minutes > 1440:
+            problems.append("ACCESS_TOKEN_EXPIRE_MINUTES is longer than 24 hours.")
     return problems
 
 
@@ -96,6 +109,11 @@ def create_app() -> FastAPI:
         # The dev server serves the frontend from a different origin, and
         # Vite's HMR client would be blocked by the production CSP.
         enable_csp=settings.is_production,
+    )
+    # Added before CORS so CORS is outermost and still decorates a 413.
+    app.add_middleware(
+        MaxBodySizeMiddleware,
+        max_bytes=settings.max_request_body_bytes,
     )
     app.add_middleware(
         CORSMiddleware,

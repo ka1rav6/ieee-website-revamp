@@ -511,6 +511,15 @@ class ContactSubmissionUpdate(BaseModel):
     status: SubmissionStatus | None = None
     admin_notes: str | None = Field(default=None, max_length=4000)
 
+    @field_validator("status")
+    @classmethod
+    def _status_cannot_be_cleared(cls, value: SubmissionStatus | None) -> SubmissionStatus | None:
+        # The column is NOT NULL. Omission is fine (defaults are not
+        # validated), but an explicit null is a 422 rather than a 500.
+        if value is None:
+            raise ValueError("A submission must keep a status.")
+        return value
+
 
 # ---------------------------------------------------------------------------
 # Site settings and aggregates
@@ -523,8 +532,25 @@ class SiteSettingsPublic(BaseModel):
     values: dict[str, str]
 
 
+# SiteSetting.key is VARCHAR(120). Keys are validated to that here so an
+# over-long key is a clear 422 rather than a database error surfacing as a 500.
+SITE_SETTING_KEY_MAX = 120
+
+
 class SiteSettingsUpdate(BaseModel):
+    """Editable copy and links.
+
+    These values are served publicly, so this is not a place for secrets.
+    """
+
     values: dict[str, str] = Field(max_length=200)
+
+    @field_validator("values")
+    @classmethod
+    def _keys_must_fit_the_column(cls, values: dict[str, str]) -> dict[str, str]:
+        if any(not 0 < len(key) <= SITE_SETTING_KEY_MAX for key in values):
+            raise ValueError(f"Setting keys must be 1-{SITE_SETTING_KEY_MAX} characters.")
+        return values
 
 
 class SiteStats(BaseModel):

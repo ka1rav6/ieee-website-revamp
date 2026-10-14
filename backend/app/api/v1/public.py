@@ -65,7 +65,11 @@ def _settings_map(db: DbSession) -> dict[str, str]:
 
 @router.get("/settings", response_model=dict[str, str])
 def read_settings(db: DbSession) -> dict[str, str]:
-    """Editable copy and links, so the admin can reword the site."""
+    """Editable copy and links, so the admin can reword the site.
+
+    Deliberately public: it is page copy, not configuration. Nothing sensitive
+    belongs in `site_settings` (see the model docstring).
+    """
     return _settings_map(db)
 
 

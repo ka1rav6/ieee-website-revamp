@@ -242,6 +242,17 @@ def _write_edition(
     edition.hero_image = payload.hero_image
     edition.is_current = payload.is_current
 
+    # Clear the children and flush before adding the replacements. A stat keeps
+    # its label across an edit, so SQLAlchemy inserting the new rows before it
+    # deletes the old ones would trip the (edition_id, label) unique constraint.
+    # The flush makes the DELETEs land first. A brand-new edition has nothing to
+    # order, so it is skipped.
+    edition.highlights = []
+    edition.stats = []
+    edition.gallery = []
+    if edition.id is not None:
+        db.flush()
+
     edition.highlights = [
         IeeeDayHighlight(
             title=item.title, description=item.description, image=item.image, sort_order=index
