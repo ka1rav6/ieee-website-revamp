@@ -1,13 +1,13 @@
 ---
-title: "Social Network Analysis: Durkheim’s Era to Contempo Social Media Spaces"
-author: "Aditi Sharma"
-author_subtitle: "B.Tech."
-category: "tech-affairs"
+title: 'Social Network Analysis: Durkheim’s Era to Contempo Social Media Spaces'
+author: Aditi Sharma
+author_subtitle: B.Tech.
+category: tech-affairs
 tags:
-  - "social networks"
-  - "research"
-cover_image: "/legacy/blog/f4a324d21c.webp"
-cover_image_alt: "Social Network Analysis: Durkheim’s Era to Contempo Social Media Spaces"
+  - research
+  - social networks
+cover_image: /legacy/blog/f4a324d21c.webp
+cover_image_alt: 'Social Network Analysis: Durkheim’s Era to Contempo Social Media Spaces'
 published: true
 featured: false
 ---
@@ -80,5 +80,3 @@ academia connected to the club.
 [
 apply
 ](https://forms.gle/5xoKNbj6moQpRn2o9)
-
-![logo](/logowhite.png)

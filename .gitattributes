@@ -1,0 +1,4 @@
+# Check text files out with LF on every platform. Prettier and ruff both
+# expect LF, so a Windows clone with core.autocrlf=true would otherwise fail
+# `just lint` on every file without a single real change.
+* text=auto eol=lf

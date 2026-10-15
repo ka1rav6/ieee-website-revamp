@@ -1,11 +1,11 @@
 ---
-title: "The Internet of Things: Connecting Devices with your Life"
-author: "Nishant Singh"
-author_subtitle: "B.Tech."
-category: "ieee-conference-minutes"
+title: 'The Internet of Things: Connecting Devices with your Life'
+author: Nishant Singh
+author_subtitle: B.Tech.
+category: ieee-conference-minutes
 tags:
-  - "IoT"
-  - "hardware"
+  - IoT
+  - hardware
 published: true
 featured: false
 ---
@@ -75,5 +75,3 @@ academia connected to the club.
 [
 apply
 ](https://forms.gle/5xoKNbj6moQpRn2o9)
-
-![logo](/logowhite.png)

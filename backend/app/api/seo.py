@@ -34,7 +34,7 @@ STATIC_ROUTES: tuple[tuple[str, str, str], ...] = (
 )
 
 
-@router.get("/robots.txt", response_class=Response)
+@router.api_route("/robots.txt", methods=["GET", "HEAD"], response_class=Response)
 def robots() -> Response:
     """Allow public crawling, keep the admin area and API out of indexes."""
     lines = [
@@ -49,7 +49,7 @@ def robots() -> Response:
     return Response("\n".join(lines), media_type="text/plain")
 
 
-@router.get("/sitemap.xml", response_class=Response)
+@router.api_route("/sitemap.xml", methods=["GET", "HEAD"], response_class=Response)
 def sitemap(db: DbSession) -> Response:
     urlset = ET.Element("urlset", {"xmlns": SITEMAP_NS})
 

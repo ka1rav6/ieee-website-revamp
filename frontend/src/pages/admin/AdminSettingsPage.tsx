@@ -199,7 +199,7 @@ function PasswordSection() {
   const [mismatch, setMismatch] = useState(false);
   const [done, setDone] = useState(false);
 
-  const [change, { submitting, error }] = useMutation(authApi.changePassword);
+  const [change, { submitting, error, fieldErrors }] = useMutation(authApi.changePassword);
 
   const onSubmit = useCallback(
     async (event: React.FormEvent) => {
@@ -237,7 +237,7 @@ function PasswordSection() {
         <SuccessNote>Password updated. Signing you out…</SuccessNote>
       ) : (
         <form onSubmit={onSubmit} noValidate className="max-w-sm space-y-4">
-          <Labelled label="Current password">
+          <Labelled label="Current password" error={fieldErrors.current_password}>
             {(props) => (
               <input
                 {...props}
@@ -250,7 +250,11 @@ function PasswordSection() {
             )}
           </Labelled>
 
-          <Labelled label="New password" hint="At least 12 characters.">
+          <Labelled
+            label="New password"
+            hint="At least 12 characters."
+            error={fieldErrors.new_password}
+          >
             {(props) => (
               <input
                 {...props}

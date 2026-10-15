@@ -10,20 +10,25 @@ from __future__ import annotations
 import logging
 import sys
 from contextlib import asynccontextmanager
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
+from sqlalchemy.engine import make_url
 from starlette.requests import Request
 from starlette.responses import Response
 
 from app.api import seo
 from app.api.v1 import api_router
-from app.core.config import Settings, settings
+from app.core.config import (
+    INSECURE_DEFAULT_POSTGRES_PASSWORD,
+    Settings,
+    settings,
+)
 from app.core.errors import register_exception_handlers
-from app.core.middleware import SecurityHeadersMiddleware
+from app.core.middleware import MaxBodySizeMiddleware, SecurityHeadersMiddleware
 
 logging.basicConfig(
     level=logging.INFO,
@@ -41,21 +46,41 @@ Everything under `/admin` requires the administrator's bearer token.
 """
 
 
+def _uses_default_database_password(cfg: Settings) -> bool:
+    """Whether the database is reached with the development password.
+
+    DATABASE_URL overrides the POSTGRES_* parts, so it is the URL's password
+    that matters when one is set.
+    """
+    if cfg.database_url:
+        return make_url(cfg.sqlalchemy_url).password == INSECURE_DEFAULT_POSTGRES_PASSWORD
+    return cfg.postgres_password == INSECURE_DEFAULT_POSTGRES_PASSWORD
+
+
 def check_production_config(cfg: Settings) -> list[str]:
     """Configuration mistakes that must not reach production.
 
     Returned rather than raised so the caller decides whether to warn or
-    refuse to start.
+    refuse to start. The environment-specific checks are only reported for
+    production, so a normal development setup stays quiet.
     """
     problems: list[str] = []
     if cfg.secret_key == INSECURE_DEFAULT_SECRET:
         problems.append("SECRET_KEY is still the development default. Run `just secret`.")
     if len(cfg.secret_key) < 32:
         problems.append("SECRET_KEY should be at least 32 characters.")
-    if cfg.site_url.startswith("http://") and "localhost" not in cfg.site_url:
-        problems.append("SITE_URL should use https:// in production.")
     if cfg.email_backend == "smtp" and not cfg.smtp_host:
         problems.append("EMAIL_BACKEND is 'smtp' but SMTP_HOST is empty.")
+
+    if cfg.is_production:
+        if "localhost" in cfg.site_url or "127.0.0.1" in cfg.site_url:
+            problems.append("SITE_URL still points at localhost. Set the public https URL.")
+        elif cfg.site_url.startswith("http://"):
+            problems.append("SITE_URL should use https:// in production.")
+        if _uses_default_database_password(cfg):
+            problems.append("POSTGRES_PASSWORD is still the development default.")
+        if cfg.access_token_expire_minutes > 1440:
+            problems.append("ACCESS_TOKEN_EXPIRE_MINUTES is longer than 24 hours.")
     return problems
 
 
@@ -96,6 +121,11 @@ def create_app() -> FastAPI:
         # The dev server serves the frontend from a different origin, and
         # Vite's HMR client would be blocked by the production CSP.
         enable_csp=settings.is_production,
+    )
+    # Added before CORS so CORS is outermost and still decorates a 413.
+    app.add_middleware(
+        MaxBodySizeMiddleware,
+        max_bytes=settings.max_request_body_bytes,
     )
     app.add_middleware(
         CORSMiddleware,
@@ -150,7 +180,9 @@ def _mount_frontend(app: FastAPI) -> None:
         name="assets",
     )
 
-    @app.get("/{full_path:path}", include_in_schema=False)
+    # HEAD as well as GET: uptime monitors and link checkers commonly probe
+    # with HEAD, and a 405 there reads as the site being down.
+    @app.api_route("/{full_path:path}", methods=["GET", "HEAD"], include_in_schema=False)
     async def serve_spa(request: Request, full_path: str) -> Response:
         # An unknown /api path is a client error, not a page.
         if full_path.startswith(("api/", "uploads/")):
@@ -159,6 +191,13 @@ def _mount_frontend(app: FastAPI) -> None:
         candidate = (static_dir / full_path).resolve()
         if full_path and candidate.is_file() and candidate.is_relative_to(static_dir.resolve()):
             return FileResponse(candidate)
+
+        # Client-side routes never contain a file extension (slugs are
+        # [a-z0-9-]), so a missing "/logo.png" is a missing file. Answering it
+        # with the HTML shell would hand an <img> a 200 it cannot render and
+        # hide broken links from checkers.
+        if PurePosixPath(full_path).suffix:
+            return JSONResponse({"detail": "Not found"}, status_code=404)
 
         del request
         return FileResponse(index_file, headers={"Cache-Control": "no-cache, must-revalidate"})

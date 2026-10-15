@@ -1,13 +1,13 @@
 ---
-title: "IEEE-IIITD Events Report"
-author: "Ananya Goyal"
-author_subtitle: "B.Tech."
-category: "events-at-ieee-iiitd"
+title: IEEE-IIITD Events Report
+author: Ananya Goyal
+author_subtitle: B.Tech.
+category: events-at-ieee-iiitd
 tags:
-  - "events"
-  - "report"
-cover_image: "/legacy/blog/e20a16d070.webp"
-cover_image_alt: "IEEE-IIITD Events Report"
+  - events
+  - report
+cover_image: /legacy/blog/e20a16d070.webp
+cover_image_alt: IEEE-IIITD Events Report
 published: true
 featured: false
 ---
@@ -325,5 +325,3 @@ academia connected to the club.
 [
 apply
 ](https://forms.gle/5xoKNbj6moQpRn2o9)
-
-![logo](/logowhite.png)

@@ -21,6 +21,7 @@ import {
   useScrolledPast,
   useScrollProgress,
 } from '@/hooks/useInteraction';
+import { useOverDarkHero } from '@/hooks/useHeaderTone';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { useTheme } from '@/hooks/useTheme';
 import { cx } from '@/utils/format';
@@ -76,6 +77,9 @@ function ThemeToggle({ tone = 'light' }: { tone?: 'light' | 'dark' }) {
 export function Header() {
   const scrolled = useScrolledPast(12);
   const progress = useScrollProgress();
+  // Over a navy page header the transparent bar takes light text; once the
+  // page scrolls it gains the paper background and goes back to ink.
+  const onDark = useOverDarkHero() && !scrolled;
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
   const { link } = useSiteSettings();
@@ -105,7 +109,8 @@ export function Header() {
 
       <header
         className={cx(
-          'fixed inset-x-0 top-0 z-50 text-ink transition-[background-color,border-color,backdrop-filter] duration-500',
+          'fixed inset-x-0 top-0 z-50 transition-[background-color,border-color,backdrop-filter,color] duration-500',
+          onDark ? 'text-on-contrast' : 'text-ink',
           scrolled
             ? 'border-b border-line bg-paper/90 backdrop-blur-md'
             : 'border-b border-transparent',
@@ -115,7 +120,7 @@ export function Header() {
           aria-label="Primary"
           className="shell flex h-[var(--header-height)] items-center justify-between gap-6"
         >
-          <Brand compact />
+          <Brand compact tone={onDark ? 'dark' : 'light'} />
 
           <ul className="hidden items-center gap-6 lg:flex">
             {NAV_LINKS.map((item) => (
@@ -145,14 +150,17 @@ export function Header() {
           </ul>
 
           <div className="flex items-center gap-3">
-            <ThemeToggle />
+            <ThemeToggle tone={onDark ? 'dark' : 'light'} />
 
             {joinUrl && (
               <a
                 href={joinUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn btn-primary btn-sm hidden sm:inline-flex"
+                className={cx(
+                  'btn btn-sm hidden sm:inline-flex',
+                  onDark ? 'btn-on-dark' : 'btn-primary',
+                )}
               >
                 Join
                 <ArrowUpRightIcon className="size-3.5" />
@@ -166,7 +174,12 @@ export function Header() {
               aria-label="Open menu"
               aria-expanded={menuOpen}
               aria-controls="mobile-menu"
-              className="mono flex h-10 items-center gap-2 border border-line px-3 transition-colors hover:bg-ink-surface hover:text-on-contrast lg:hidden"
+              className={cx(
+                'mono flex h-10 items-center gap-2 border px-3 transition-colors lg:hidden',
+                onDark
+                  ? 'border-on-contrast/40 hover:bg-silk hover:text-ink'
+                  : 'border-line hover:bg-ink-surface hover:text-on-contrast',
+              )}
             >
               Menu
               <span aria-hidden="true" className="flex flex-col gap-[3px]">

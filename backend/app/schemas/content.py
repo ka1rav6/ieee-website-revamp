@@ -27,6 +27,18 @@ def _blank_to_none(value: str | None) -> str | None:
     return stripped or None
 
 
+def _reject_null(value: object) -> object:
+    """Refuse an explicit null for a column that cannot be empty.
+
+    PATCH fields default to None so they can be omitted, and defaults are not
+    validated - so this only fires when the client actually sent `null`,
+    which would otherwise reach the database as a NOT NULL violation (a 500).
+    """
+    if value is None:
+        raise ValueError("This field cannot be empty.")
+    return value
+
+
 # ---------------------------------------------------------------------------
 # Blogs
 # ---------------------------------------------------------------------------
@@ -124,6 +136,10 @@ class BlogPostUpdate(BaseModel):
     is_featured: bool | None = None
     published_at: date | None = None
 
+    _required = field_validator(
+        "title", "body", "author_name", "is_published", "is_featured", mode="after"
+    )(_reject_null)
+
 
 class BlogCategoryWrite(BaseModel):
     name: str = Field(min_length=1, max_length=120)
@@ -194,11 +210,23 @@ class TeamMemberUpdate(BaseModel):
     sort_order: int | None = None
     is_active: bool | None = None
 
+    _required = field_validator("name", "category", "sort_order", "is_active", mode="after")(
+        _reject_null
+    )
+
 
 class ReorderRequest(BaseModel):
     """New ordering for a listing, as ids in the order they should appear."""
 
     ids: list[int] = Field(min_length=1, max_length=500)
+
+    @field_validator("ids")
+    @classmethod
+    def _no_repeats(cls, ids: list[int]) -> list[int]:
+        # A repeated id would be numbered twice and leave a gap in the order.
+        if len(set(ids)) != len(ids):
+            raise ValueError("Each item can appear only once.")
+        return ids
 
 
 # ---------------------------------------------------------------------------
@@ -259,6 +287,8 @@ class AlumnusUpdate(BaseModel):
     website_url: HttpUrl | None = None
     is_featured: bool | None = None
     sort_order: int | None = None
+
+    _required = field_validator("name", "is_featured", "sort_order", mode="after")(_reject_null)
 
 
 class TeamMemberGraduate(BaseModel):
@@ -335,6 +365,8 @@ class CollaborationUpdate(BaseModel):
     is_featured: bool | None = None
     sort_order: int | None = None
 
+    _required = field_validator("name", "is_featured", "sort_order", mode="after")(_reject_null)
+
 
 # ---------------------------------------------------------------------------
 # Events
@@ -388,6 +420,10 @@ class EventUpdate(BaseModel):
     is_featured: bool | None = None
     is_published: bool | None = None
     sort_order: int | None = None
+
+    _required = field_validator("title", "is_featured", "is_published", "sort_order", mode="after")(
+        _reject_null
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -511,6 +547,15 @@ class ContactSubmissionUpdate(BaseModel):
     status: SubmissionStatus | None = None
     admin_notes: str | None = Field(default=None, max_length=4000)
 
+    @field_validator("status")
+    @classmethod
+    def _status_cannot_be_cleared(cls, value: SubmissionStatus | None) -> SubmissionStatus | None:
+        # The column is NOT NULL. Omission is fine (defaults are not
+        # validated), but an explicit null is a 422 rather than a 500.
+        if value is None:
+            raise ValueError("A submission must keep a status.")
+        return value
+
 
 # ---------------------------------------------------------------------------
 # Site settings and aggregates
@@ -523,8 +568,25 @@ class SiteSettingsPublic(BaseModel):
     values: dict[str, str]
 
 
+# SiteSetting.key is VARCHAR(120). Keys are validated to that here so an
+# over-long key is a clear 422 rather than a database error surfacing as a 500.
+SITE_SETTING_KEY_MAX = 120
+
+
 class SiteSettingsUpdate(BaseModel):
+    """Editable copy and links.
+
+    These values are served publicly, so this is not a place for secrets.
+    """
+
     values: dict[str, str] = Field(max_length=200)
+
+    @field_validator("values")
+    @classmethod
+    def _keys_must_fit_the_column(cls, values: dict[str, str]) -> dict[str, str]:
+        if any(not 0 < len(key) <= SITE_SETTING_KEY_MAX for key in values):
+            raise ValueError(f"Setting keys must be 1-{SITE_SETTING_KEY_MAX} characters.")
+        return values
 
 
 class SiteStats(BaseModel):

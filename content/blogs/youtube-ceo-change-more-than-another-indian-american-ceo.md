@@ -1,10 +1,10 @@
 ---
-title: "YouTube CEO Change: More than another Indian-American CEO"
-author: "Nishita Lohana"
-author_subtitle: "B.Tech."
-category: "tech-tyranny"
+title: 'YouTube CEO Change: More than another Indian-American CEO'
+author: Nishita Lohana
+author_subtitle: B.Tech.
+category: tech-tyranny
 tags:
-  - "industry"
+  - industry
 published: true
 featured: false
 ---
@@ -66,5 +66,3 @@ academia connected to the club.
 [
 apply
 ](https://forms.gle/5xoKNbj6moQpRn2o9)
-
-![logo](/logowhite.png)

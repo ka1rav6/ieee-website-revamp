@@ -291,3 +291,8 @@ def downgrade() -> None:
     op.drop_index(op.f('ix_admin_email'), table_name='admin')
     op.drop_table('admin')
     # ### end Alembic commands ###
+
+    # Postgres enum types outlive the tables that used them. Left behind, they
+    # make a downgrade followed by an upgrade fail on CREATE TYPE.
+    for enum_name in ("inquiry_type", "submission_status", "team_category"):
+        sa.Enum(name=enum_name).drop(op.get_bind(), checkfirst=True)

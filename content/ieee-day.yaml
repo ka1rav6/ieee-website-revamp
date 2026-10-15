@@ -1,18 +1,12 @@
 # IEEE Day editions, newest first.
-#
-# IEEE Day marks the first time engineers worldwide gathered to share their
-# technical ideas, in 1884. It is celebrated on the first Tuesday of October.
-#
-# `stats`, `highlights` and `gallery` start empty because the previous
-# website never recorded them. Fill them in after each celebration and run
-# `just content-import` - the page renders whichever sections have content
-# and quietly omits the rest, so partial entries look intentional.
-#
-# Tag an event with `ieee_day_year: 2026` in events.yaml to list it here.
+# `stats`, `highlights` and `gallery` are optional; the page omits any
+# section with no content, so a partial entry still looks intentional.
+# Edit here, then `just content-import ieee-day`. Edit in the dashboard,
+# then `just dbsync ieee-day` to pull it back - which rewrites this file.
 
 - year: 2026
-  theme: "Leveraging Technology for a Better Tomorrow"
-  tagline: "One day. Every section. The same idea."
+  theme: Leveraging Technology for a Better Tomorrow
+  tagline: One day. Every section. The same idea.
   celebrated_on: 2026-10-06
   is_current: true
   description: |
@@ -28,6 +22,3 @@
     competitions that are more fun than they are serious.
 
     Everyone on campus is welcome, member or not.
-  stats: []
-  highlights: []
-  gallery: []

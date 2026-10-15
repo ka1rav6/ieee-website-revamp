@@ -6,6 +6,7 @@ from fastapi import APIRouter, Query, status
 from sqlalchemy import func, select
 
 from app.api.v1.admin._crud import (
+    append_position,
     apply_order,
     assign_slug,
     get_or_404,
@@ -66,6 +67,9 @@ def create_member(payload: TeamMemberCreate, admin: CurrentAdmin, db: DbSession)
     member.slug = assign_slug(
         db, TeamMember, requested=requested_slug, fallback=payload.name, max_length=160
     )
+    position = append_position(db, TeamMember, payload, TeamMember.category == payload.category)
+    if position is not None:
+        member.sort_order = position
     db.add(member)
     db.commit()
     db.refresh(member)
@@ -215,6 +219,9 @@ def create_alumnus(payload: AlumnusCreate, admin: CurrentAdmin, db: DbSession) -
     alumnus.slug = assign_slug(
         db, Alumnus, requested=requested_slug, fallback=payload.name, max_length=160
     )
+    position = append_position(db, Alumnus, payload)
+    if position is not None:
+        alumnus.sort_order = position
     db.add(alumnus)
     db.commit()
     db.refresh(alumnus)

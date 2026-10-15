@@ -7,13 +7,14 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import selectinload
 
 from app.api.v1.admin._crud import (
+    append_position,
     apply_order,
     assign_slug,
     get_or_404,
     payload_to_columns,
 )
 from app.core.deps import CurrentAdmin, DbSession
-from app.core.errors import NotFoundError
+from app.core.errors import NotFoundError, ValidationError
 from app.models.content import (
     Collaboration,
     Event,
@@ -67,6 +68,9 @@ def create_collaboration(
     collaboration.slug = assign_slug(
         db, Collaboration, requested=requested_slug, fallback=payload.name, max_length=160
     )
+    position = append_position(db, Collaboration, payload)
+    if position is not None:
+        collaboration.sort_order = position
     db.add(collaboration)
     db.commit()
     db.refresh(collaboration)
@@ -242,6 +246,17 @@ def _write_edition(
     edition.hero_image = payload.hero_image
     edition.is_current = payload.is_current
 
+    # Clear the children and flush before adding the replacements. A stat keeps
+    # its label across an edit, so SQLAlchemy inserting the new rows before it
+    # deletes the old ones would trip the (edition_id, label) unique constraint.
+    # The flush makes the DELETEs land first. A brand-new edition has nothing to
+    # order, so it is skipped.
+    edition.highlights = []
+    edition.stats = []
+    edition.gallery = []
+    if edition.id is not None:
+        db.flush()
+
     edition.highlights = [
         IeeeDayHighlight(
             title=item.title, description=item.description, image=item.image, sort_order=index
@@ -274,7 +289,7 @@ def upsert_edition(
     """Create or replace one IEEE Day edition."""
     del admin
     if payload.year != year:
-        raise NotFoundError("The year in the URL and the payload must match.")
+        raise ValidationError("The year in the URL and the payload must match.")
 
     edition = db.scalar(_edition_query().where(IeeeDayEdition.year == year))
     if edition is None:

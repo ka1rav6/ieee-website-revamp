@@ -10,8 +10,11 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-ieee}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ieee-local-dev-password}
       POSTGRES_DB: ${POSTGRES_DB:-ieee}
+    # Published on the loopback interface only: the host's tools can reach the
+    # database, the network cannot. Docker's published ports bypass most host
+    # firewalls, so "0.0.0.0" here would put Postgres on the internet.
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:

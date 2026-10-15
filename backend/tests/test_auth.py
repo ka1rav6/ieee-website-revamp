@@ -109,7 +109,18 @@ def test_password_change_requires_the_current_password(client, auth_headers):
         json={"current_password": "wrong", "new_password": "a-brand-new-password"},
     )
 
-    assert response.status_code == 401
+    assert response.status_code == 422
+    assert "current_password" in response.json()["fields"]
+
+
+def test_a_wrong_current_password_does_not_end_the_session(client, auth_headers):
+    client.post(
+        "/api/v1/auth/password",
+        headers=auth_headers,
+        json={"current_password": "wrong", "new_password": "a-brand-new-password"},
+    )
+
+    assert client.get("/api/v1/auth/me", headers=auth_headers).status_code == 200
 
 
 def test_short_new_password_is_refused(client, auth_headers):
@@ -189,3 +200,15 @@ def test_a_token_of_the_wrong_type_is_rejected(client, admin: Admin):
 
 def test_hashing_the_same_password_twice_gives_different_hashes():
     assert hash_password("same-password") != hash_password("same-password")
+
+
+def test_an_unknown_address_still_spends_time_verifying(client, admin, monkeypatch):
+    from app.api.v1 import auth
+
+    calls = []
+    monkeypatch.setattr(auth, "burn_verification_time", lambda password: calls.append(password))
+
+    response = client.post(LOGIN, json={"email": "nobody@example.com", "password": "guess-1234"})
+
+    assert response.status_code == 401
+    assert calls == ["guess-1234"]

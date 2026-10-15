@@ -1,284 +1,286 @@
 # Team roster. List order is display order within each category.
 # Categories: faculty, core, executive, mentor.
-# Edit this file and run `just content-import` to update the website.
+# Edit here, then `just content-import members`. Edit in the dashboard,
+# then `just dbsync members` to pull it back - which rewrites this file.
 
-
-# --- Representatives ---
-- name: "Dr. Chanekar Prasad Vilas"
-  slug: "dr-chanekar-prasad-vilas"
-  position: "Faculty Coordinator"
+- name: Dr. Chanekar Prasad Vilas
+  slug: dr-chanekar-prasad-vilas
+  position: Faculty Coordinator
   category: faculty
-  photo: "/legacy/people/chanekar.webp"
-  term: "2025-26"
-- name: "Dr. Shobha Sundar Ram"
-  slug: "dr-shobha-sundar-ram"
-  position: "WIE Faculty Coordinator"
+  photo: /legacy/people/chanekar.webp
+  term: 2026-27
+- name: Dr. Shobha Sundar Ram
+  slug: dr-shobha-sundar-ram
+  position: WIE Faculty Coordinator
   category: faculty
-  photo: "/legacy/people/shobha.webp"
-  term: "2025-26"
-- name: "Dr. Rajiv Ratn Shah"
-  slug: "dr-rajiv-ratn-shah"
-  position: "CompSoc Faculty Coordinator"
+  photo: /legacy/people/shobha.webp
+  term: 2026-27
+- name: Dr. Rajiv Ratn Shah
+  slug: dr-rajiv-ratn-shah
+  position: CompSoc Faculty Coordinator
   category: faculty
-  photo: "/legacy/people/rajiv.webp"
-  term: "2025-26"
-- name: "Dr. Ranjitha Prasad"
-  slug: "dr-ranjitha-prasad"
-  position: "SigProSoc Faculty Mentor"
+  photo: /legacy/people/rajiv.webp
+  term: 2026-27
+- name: Dr. Ranjitha Prasad
+  slug: dr-ranjitha-prasad
+  position: SigProSoc Faculty Mentor
   category: faculty
-  photo: "/legacy/people/ranjitha.webp"
-  term: "2025-26"
-
-# --- IEEE Core Team ---
-- name: "Anshul Kumar Singh"
-  slug: "anshul-kumar-singh"
-  position: "Chairperson"
+  photo: /legacy/people/ranjitha.webp
+  term: 2026-27
+- name: Sidharth
+  slug: sidharth
+  position: Chairperson
   category: core
-  photo: "/legacy/people/anshul-kumar-singh.webp"
-  term: "2025-26"
-- name: "Rijusmit Biswas"
-  slug: "rijusmit-biswas"
-  position: "Vice-Chairperson"
+  photo: /people/sidharth.webp
+  term: 2026-27
+- name: Vatsal Garg
+  slug: vatsal-garg
+  position: Vice-Chairperson
   category: core
-  photo: "/legacy/people/rijusmit-biswas.webp"
-  term: "2025-26"
-- name: "Sidharth"
-  slug: "sidharth"
-  position: "Secretary"
+  photo: /people/vatsal-garg.webp
+  term: 2026-27
+- name: Bhumik Yadav
+  slug: bhumik-yadav
+  position: Secretary
   category: core
-  photo: "/legacy/people/sidharth-iiitd.webp"
-  term: "2025-26"
-- name: "Daksh Singhal"
-  slug: "daksh-singhal"
-  position: "Treasurer"
+  photo: /people/bhumik-yadav.webp
+  term: 2026-27
+- name: Saksham Gupta
+  slug: saksham-gupta
+  position: Treasurer
   category: core
-  photo: "/legacy/people/daksh-singhal.webp"
-  term: "2025-26"
-- name: "Keshav Singh"
-  slug: "keshav-singh"
-  position: "Webmaster"
+  photo: /people/saksham-gupta.webp
+  term: 2026-27
+- name: Kairav Dutta
+  slug: kairav-dutta
+  position: Webmaster
   category: core
-  photo: "/legacy/people/keshav-singh.webp"
-  term: "2025-26"
-- name: "Janisha Mehta"
-  slug: "janisha-mehta"
-  position: "Events Lead"
+  photo: /people/kairav-dutta.webp
+  term: 2026-27
+- name: Yash Vardhan Kapil
+  slug: yash-vardhan-kapil
+  position: Webmaster
   category: core
-  photo: "/legacy/people/janisha-mehta.webp"
-  term: "2025-26"
-- name: "Ritu Basumatary"
-  slug: "ritu-basumatary"
-  position: "Design Lead"
+  term: 2026-27
+- name: Kritarth Jain
+  slug: kritarth-jain
+  position: Operations Head
   category: core
-  photo: "/legacy/people/ritu-basumatary.webp"
-  term: "2025-26"
-- name: "Vatsal"
-  slug: "vatsal"
-  position: "Operations Head"
+  photo: /people/kritarth-jain.webp
+  term: 2026-27
+- name: Suraj Kumar
+  slug: suraj-kumar
+  position: PR & Outreach Head
   category: core
-  photo: "/legacy/people/vatsal.webp"
-  term: "2025-26"
-
-# --- Executive Committee ---
-- name: "Gagandeep singh virdi"
-  slug: "gagandeep-singh-virdi"
+  photo: /people/suraj-kumar.webp
+  term: 2026-27
+- name: Kanishk Dadhich
+  slug: kanishk-dadhich
+  position: Events
   category: executive
-  photo: "/legacy/people/gagandeepsinghvirdi.webp"
-  term: "2025-26"
-- name: "Dakshant Choudhary"
-  slug: "dakshant-choudhary"
+  photo: /people/kanishk-dadhich.webp
+  term: 2026-27
+- name: Amirthavarshini Panchatcharam
+  slug: amirthavarshini-panchatcharam
+  position: Design
   category: executive
-  photo: "/legacy/people/dakshant-choudhary.webp"
-  term: "2025-26"
-- name: "Shresht Ashish"
-  slug: "shresht-ashish"
+  photo: /people/amirthavarshini-panchatcharam.webp
+  term: 2026-27
+- name: Dishita Prasad
+  slug: dishita-prasad
+  position: PR
   category: executive
-  photo: "/legacy/people/shreshtashish.webp"
-  term: "2025-26"
-- name: "Garvit Kochar"
-  slug: "garvit-kochar"
+  photo: /people/dishita-prasad.webp
+  term: 2026-27
+- name: Harshit
+  slug: harshit
+  position: PR
   category: executive
-  photo: "/legacy/people/garvitkochar.webp"
-  term: "2025-26"
-- name: "Aditya Singh Yadav"
-  slug: "aditya-singh-yadav"
+  photo: /people/harshit.webp
+  term: 2026-27
+- name: Pulkit Singla
+  slug: pulkit-singla
+  position: Events
   category: executive
-  photo: "/legacy/people/adityasinghyadav.webp"
-  term: "2025-26"
-- name: "Priyansh Varshney"
-  slug: "priyansh-varshney"
+  photo: /people/pulkit-singla.webp
+  term: 2026-27
+- name: Ayush
+  slug: ayush
   category: executive
-  photo: "/legacy/people/priyansh-varshney.webp"
-  term: "2025-26"
-- name: "Preyash Prakash"
-  slug: "preyash-prakash"
+  photo: /people/ayush.webp
+  term: 2026-27
+- name: Devesh Bhuwanesh Agarwal
+  slug: devesh-bhuwanesh-agarwal
+  position: Operations
   category: executive
-  photo: "/legacy/people/preyash-prakash.webp"
-  term: "2025-26"
-- name: "Pranav Aggarwal"
-  slug: "pranav-aggarwal"
+  photo: /people/devesh-bhuwanesh-agarwal.webp
+  term: 2026-27
+- name: Aditi Gupta
+  slug: aditi-gupta
+  position: PR
   category: executive
-  photo: "/legacy/people/pranav-aggarwal.webp"
-  term: "2025-26"
-- name: "Ronak Anand"
-  slug: "ronak-anand"
+  photo: /people/aditi-gupta.webp
+  term: 2026-27
+- name: Utkarsh Yadav
+  slug: utkarsh-yadav
+  position: Web Development
   category: executive
-  photo: "/legacy/people/ronak-anand.webp"
-  term: "2025-26"
-- name: "Agrim Upadhyay"
-  slug: "agrim-upadhyay"
+  photo: /people/utkarsh-yadav.webp
+  term: 2026-27
+- name: Anirudh Chauhan
+  slug: anirudh-chauhan
+  position: PR
   category: executive
-  photo: "/legacy/people/agrim-upadhyay.webp"
-  term: "2025-26"
-- name: "Shlok Gupta"
-  slug: "shlok-gupta"
+  term: 2026-27
+- name: Shanaya Singh
+  slug: shanaya-singh
+  position: Design & Events
   category: executive
-  photo: "/legacy/people/shlok-gupta.webp"
-  term: "2025-26"
-- name: "Mridul Verma"
-  slug: "mridul-verma"
+  term: 2026-27
+- name: Ndalo Kent
+  slug: ndalo-kent
+  position: Operations
   category: executive
-  photo: "/legacy/people/mridul-verma.webp"
-  term: "2025-26"
-- name: "Anshuman Anand"
-  slug: "anshuman-anand"
+  term: 2026-27
+- name: Garima Juneja
+  slug: garima-juneja
+  position: Operations
   category: executive
-  photo: "/legacy/people/anshuman-anand.webp"
-  term: "2025-26"
-- name: "Arijit Chowdhury"
-  slug: "arijit-chowdhury"
+  photo: /people/garima-juneja.webp
+  term: 2026-27
+- name: Abhay Puri
+  slug: abhay-puri
+  position: Events
   category: executive
-  photo: "/legacy/people/arijit-chowdhury.webp"
-  term: "2025-26"
-- name: "Tejas Singh Bidhuri"
-  slug: "tejas-singh-bidhuri"
+  photo: /people/abhay-puri.webp
+  term: 2026-27
+- name: Inesh Bilaska
+  slug: inesh-bilaska
+  position: PR
   category: executive
-  photo: "/legacy/people/tejas-singh-bidhuri.webp"
-  term: "2025-26"
-- name: "Akshit K Bansal"
-  slug: "akshit-k-bansal"
+  photo: /people/inesh-bilaska.webp
+  term: 2026-27
+- name: Ayushman Gupta
+  slug: ayushman-gupta
+  position: Events & Operations
   category: executive
-  photo: "/legacy/people/akshit-k-bansal.webp"
-  term: "2025-26"
-- name: "Sameeksha dagar"
-  slug: "sameeksha-dagar"
+  photo: /people/ayushman-gupta.webp
+  term: 2026-27
+- name: Aryan Singh
+  slug: aryan-singh
+  position: Design & Events
   category: executive
-  photo: "/legacy/people/sameeksha-dagar.webp"
-  term: "2025-26"
-- name: "Jas Kamra"
-  slug: "jas-kamra"
+  photo: /people/aryan-singh.webp
+  term: 2026-27
+- name: Rajdeep Saini
+  slug: rajdeep-saini
+  position: Web Development
   category: executive
-  photo: "/legacy/people/jas-kamra.webp"
-  term: "2025-26"
-- name: "Dhruv Dagar"
-  slug: "dhruv-dagar"
+  photo: /people/rajdeep-saini.webp
+  term: 2026-27
+- name: Brijesh
+  slug: brijesh
+  position: Events & Operations
   category: executive
-  photo: "/legacy/people/dhruv-dagar.webp"
-  term: "2025-26"
-- name: "Snehil Modi"
-  slug: "snehil-modi"
+  photo: /people/brijesh.webp
+  term: 2026-27
+- name: Nihad Ali
+  slug: nihad-ali
+  position: PR
   category: executive
-  photo: "/legacy/people/snehil-modi.webp"
-  term: "2025-26"
-- name: "Mehardeep Singh Bhalla"
-  slug: "mehardeep-singh-bhalla"
+  term: 2026-27
+- name: Kushaan Vadehra
+  slug: kushaan-vadehra
+  position: Design & PR
   category: executive
-  photo: "/legacy/people/mehardeep-singh-bhalla.webp"
-  term: "2025-26"
-- name: "Ayush"
-  slug: "ayush"
+  photo: /people/kushaan-vadehra.webp
+  term: 2026-27
+- name: Manik Goel
+  slug: manik-goel
+  position: Web Development
   category: executive
-  photo: "/legacy/people/ayush-kumar.webp"
-  term: "2025-26"
-- name: "Kartik Yadav"
-  slug: "kartik-yadav"
+  photo: /people/manik-goel.webp
+  term: 2026-27
+- name: Yash
+  slug: yash
+  position: Operations
   category: executive
-  photo: "/legacy/people/kartikyadav.webp"
-  term: "2025-26"
-- name: "Ayush Kamboj"
-  slug: "ayush-kamboj"
+  photo: /people/yash.webp
+  term: 2026-27
+- name: Vidhi Vashisth
+  slug: vidhi-vashisth
+  position: Events & Operations
   category: executive
-  photo: "/legacy/people/ayush-kamboj.webp"
-  term: "2025-26"
-- name: "Saketh Balliwar"
-  slug: "saketh-balliwar"
+  photo: /people/vidhi-vashisth.webp
+  term: 2026-27
+- name: Krish Sharma
+  slug: krish-sharma
+  position: Events
   category: executive
-  photo: "/legacy/people/saketh-balliwar.webp"
-  term: "2025-26"
-- name: "Het Riteshkumar Shah"
-  slug: "het-riteshkumar-shah"
+  photo: /people/krish-sharma.webp
+  term: 2026-27
+- name: Jalaj Singh
+  slug: jalaj-singh
+  position: Events
   category: executive
-  photo: "/legacy/people/het-riteshkumar-shah.webp"
-  term: "2025-26"
-- name: "Tarandeep"
-  slug: "tarandeep"
+  photo: /people/jalaj-singh.webp
+  term: 2026-27
+- name: Abhimanyu Agarwal
+  slug: abhimanyu-agarwal
+  position: PR & Content
   category: executive
-  photo: "/legacy/people/tarandeep-singh-wadhwa.webp"
-  term: "2025-26"
-- name: "Himanshu singh"
-  slug: "himanshu-singh"
+  photo: /people/abhimanyu-agarwal.webp
+  term: 2026-27
+- name: Yash Aggarwal
+  slug: yash-aggarwal
+  position: PR & Content
   category: executive
-  photo: "/legacy/people/himanshu-singh.webp"
-  term: "2025-26"
-- name: "Rishi Pendyala"
-  slug: "rishi-pendyala"
+  photo: /people/yash-aggarwal.webp
+  term: 2026-27
+- name: Abhinav Saini
+  slug: abhinav-saini
+  position: PR & Content
   category: executive
-  photo: "/legacy/people/rishi-pendyala.webp"
-  term: "2025-26"
-- name: "Pratham Prakash"
-  slug: "pratham-prakash"
+  term: 2026-27
+- name: Rojleena Pegu
+  slug: rojleena-pegu
+  position: PR
   category: executive
-  photo: "/legacy/people/pratham-prakash.webp"
-  term: "2025-26"
-- name: "Aryan Raj"
-  slug: "aryan-raj"
+  photo: /people/rojleena-pegu.webp
+  term: 2026-27
+- name: Anvi Garg
+  slug: anvi-garg
+  position: Events & Operations
   category: executive
-  term: "2025-26"
-- name: "Chahat Ahuja"
-  slug: "chahat-ahuja"
+  photo: /people/anvi-garg.webp
+  term: 2026-27
+- name: Sanvi Sharma
+  slug: sanvi-sharma
+  position: Events & Operations
   category: executive
-  photo: "/legacy/people/chahat.webp"
-  term: "2025-26"
-- name: "Satyam"
-  slug: "satyam"
+  photo: /people/sanvi-sharma.webp
+  term: 2026-27
+- name: Mridul Surana
+  slug: mridul-surana
+  position: PR
   category: executive
-  photo: "/legacy/people/satyam-ieee.webp"
-  term: "2025-26"
-- name: "Yuvraj Verma"
-  slug: "yuvraj-verma"
+  photo: /people/mridul-surana.webp
+  term: 2026-27
+- name: Abhinav Tripathi
+  slug: abhinav-tripathi
+  position: Events & Operations
   category: executive
-  photo: "/legacy/people/yuvraj-verma.webp"
-  term: "2025-26"
-- name: "Divyansh Mishra"
-  slug: "divyansh-mishra"
+  photo: /people/abhinav-tripathi.webp
+  term: 2026-27
+- name: Ananyaj Gupta
+  slug: ananyaj-gupta
+  position: Events & Operations
   category: executive
-  photo: "/legacy/people/divyansh-mishra.webp"
-  term: "2025-26"
-- name: "Devesh Roy"
-  slug: "devesh-roy"
-  category: executive
-  photo: "/legacy/people/devesh-roy.webp"
-  term: "2025-26"
-- name: "Anika Aharwal"
-  slug: "anika-aharwal"
-  category: executive
-  photo: "/legacy/people/anika-aharwal.webp"
-  term: "2025-26"
-- name: "Abhimanyu Sharma"
-  slug: "abhimanyu-sharma"
-  category: executive
-  photo: "/legacy/people/abhimanyu-sharma.webp"
-  term: "2025-26"
-- name: "Vikas Meena"
-  slug: "vikas-meena"
-  category: executive
-  photo: "/legacy/people/vikas-meena.webp"
-  term: "2025-26"
-
-# --- Mentors ---
-- name: "Divyajeet Singh"
-  slug: "divyajeet-singh"
-  position: "Chairperson"
+  photo: /people/ananyaj-gupta.webp
+  term: 2026-27
+- name: Divyajeet Singh
+  slug: divyajeet-singh
+  position: Chairperson
   category: mentor
-  photo: "/legacy/people/divyajeet.webp"
-  term: "2025-26"
+  photo: /legacy/people/divyajeet.webp
+  term: 2025-26

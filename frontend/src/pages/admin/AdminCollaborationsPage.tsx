@@ -292,7 +292,7 @@ export default function AdminCollaborationsPage() {
           {data.map((collaboration, index) => (
             <li
               key={collaboration.id}
-              className="flex items-center gap-3 p-3 transition-colors hover:bg-[var(--surface-sunken)]"
+              className="flex flex-wrap items-center gap-3 p-3 transition-colors hover:bg-[var(--surface-sunken)] sm:flex-nowrap"
             >
               <ReorderControls
                 label={collaboration.name}
@@ -326,7 +326,7 @@ export default function AdminCollaborationsPage() {
                 {collaboration.year ?? '—'}
               </span>
 
-              <div className="flex shrink-0 items-center gap-1">
+              <div className="flex w-full shrink-0 items-center justify-end gap-1 sm:w-auto">
                 <button
                   type="button"
                   onClick={() => setEditing(collaboration)}

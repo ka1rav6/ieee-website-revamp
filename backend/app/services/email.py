@@ -21,11 +21,21 @@ class EmailDeliveryError(Exception):
     """Raised by a backend that could not hand the message off."""
 
 
+def _single_line(value: str) -> str:
+    """Collapse whitespace, line breaks included, into single spaces.
+
+    The subject carries a visitor's name and subject line. Python's email
+    package refuses a header containing CR or LF (header injection), so an
+    unflattened newline would make the notification fail outright.
+    """
+    return " ".join(value.split())
+
+
 def _build_message(*, to: str, subject: str, body: str, cfg: Settings) -> EmailMessage:
     message = EmailMessage()
     message["From"] = cfg.email_from
     message["To"] = to
-    message["Subject"] = subject
+    message["Subject"] = _single_line(subject)
     message.set_content(body)
     return message
 
@@ -50,9 +60,14 @@ def send_email(*, to: str, subject: str, body: str, cfg: Settings | None = None)
         return False
 
     if cfg.email_backend == "console":
-        # Useful in development and a reasonable default in production: the
-        # submission is already safely in the database either way.
-        logger.info("Email to %s | %s\n%s", to, subject, body)
+        # The submission is already stored and visible in the admin inbox, so
+        # the body is a development convenience rather than a requirement. In
+        # production it would write a visitor's name, address and message into
+        # the logs, so only an opaque marker is logged there.
+        if cfg.is_production:
+            logger.info("Email to %s not sent (console backend); body withheld.", to)
+        else:
+            logger.info("Email to %s | %s\n%s", to, subject, body)
         return True
 
     message = _build_message(to=to, subject=subject, body=body, cfg=cfg)

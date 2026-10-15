@@ -138,7 +138,7 @@ def update_settings(
 
 
 @uploads_router.post("", status_code=status.HTTP_201_CREATED)
-async def upload_file(
+def upload_file(
     admin: CurrentAdmin,
     file: UploadFile = File(..., description="JPEG, PNG, WebP or GIF image"),
 ) -> dict[str, str | int]:
@@ -147,9 +147,13 @@ async def upload_file(
     Reading the body here is bounded by the configured size limit, which is
     checked against the bytes actually received rather than a client-supplied
     Content-Length.
+
+    A plain `def`, so FastAPI runs it in its threadpool: decoding and
+    re-encoding an image is CPU work that would otherwise stall every other
+    request on the event loop.
     """
     del admin
-    content = await file.read(app_settings.max_upload_size_bytes + 1)
+    content = file.file.read(app_settings.max_upload_size_bytes + 1)
     stored = save_image(content=content, content_type=file.content_type, filename=file.filename)
     return {
         "url": stored.url,

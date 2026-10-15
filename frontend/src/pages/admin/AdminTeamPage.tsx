@@ -644,9 +644,12 @@ export default function AdminTeamPage() {
             ) : (
               <ul className="card divide-y divide-[var(--border-subtle)] overflow-hidden">
                 {group.members.map((member, index) => (
+                  // On a phone the actions drop to their own line, so the name
+                  // keeps the width it needs instead of being cut to a few
+                  // characters by five buttons.
                   <li
                     key={member.id}
-                    className="flex items-center gap-3 p-3 transition-colors hover:bg-[var(--surface-sunken)]"
+                    className="flex flex-wrap items-center gap-3 p-3 transition-colors hover:bg-[var(--surface-sunken)] sm:flex-nowrap"
                   >
                     <ReorderControls
                       label={member.name}
@@ -670,7 +673,7 @@ export default function AdminTeamPage() {
                       <p className="truncate text-xs text-muted">{member.position ?? '—'}</p>
                     </div>
 
-                    <div className="flex shrink-0 items-center gap-1">
+                    <div className="flex w-full shrink-0 items-center justify-end gap-1 sm:w-auto">
                       <button
                         type="button"
                         onClick={() => setGraduating(member)}

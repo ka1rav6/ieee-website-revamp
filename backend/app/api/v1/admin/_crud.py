@@ -11,7 +11,7 @@ from __future__ import annotations
 from typing import Any
 
 from pydantic import BaseModel
-from sqlalchemy import select
+from sqlalchemy import ColumnElement, func, select
 from sqlalchemy.orm import Session
 
 from app.core.errors import ConflictError, NotFoundError
@@ -75,6 +75,22 @@ def assign_slug(
         return cleaned
 
     return unique_slug(fallback, taken, max_length=max_length)
+
+
+def append_position(
+    db: Session, model: type[Any], payload: BaseModel, *scope: ColumnElement[bool]
+) -> int | None:
+    """The sort_order that puts a new record after the existing ones.
+
+    Returns None when the client chose a position itself. `scope` narrows the
+    listing the record joins (a team member is ordered within its category).
+    Appending matches what an admin expects from "Add" - and what graduating
+    a member onto the alumni list already does.
+    """
+    if "sort_order" in payload.model_fields_set:
+        return None
+    last = db.scalar(select(func.max(model.sort_order)).where(*scope))
+    return 0 if last is None else last + 1
 
 
 def apply_order(db: Session, model: type[Any], ids: list[int], label: str) -> int:

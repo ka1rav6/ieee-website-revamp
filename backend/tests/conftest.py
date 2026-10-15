@@ -25,6 +25,9 @@ os.environ["ENVIRONMENT"] = "test"
 os.environ["SECRET_KEY"] = "test-secret-key-not-used-anywhere-real"
 os.environ["EMAIL_BACKEND"] = "none"
 os.environ["POSTGRES_DB"] = TEST_DB_NAME
+# No proxy is trusted in tests, so X-Forwarded-For is ignored unless a test
+# opts in. Keeps the suite independent of the developer's local .env.
+os.environ["TRUSTED_PROXIES"] = ""
 
 from app.core.config import settings  # noqa: E402
 from app.core.deps import get_db  # noqa: E402

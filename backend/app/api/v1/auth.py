@@ -14,9 +14,10 @@ from sqlalchemy import select
 
 from app.core.config import settings
 from app.core.deps import ClientIp, CurrentAdmin, DbSession
-from app.core.errors import AuthError, RateLimitError
+from app.core.errors import AuthError, FieldError, RateLimitError
 from app.core.rate_limit import RateLimiter
 from app.core.security import (
+    burn_verification_time,
     create_access_token,
     hash_password,
     needs_rehash,
@@ -46,7 +47,10 @@ def login(payload: LoginRequest, db: DbSession, ip: ClientIp) -> TokenResponse:
         )
 
     admin = db.scalar(select(Admin).where(Admin.email == payload.email.lower()))
-    if admin is None or not verify_password(payload.password, admin.password_hash):
+    if admin is None:
+        burn_verification_time(payload.password)
+        raise AuthError(INVALID_CREDENTIALS)
+    if not verify_password(payload.password, admin.password_hash):
         raise AuthError(INVALID_CREDENTIALS)
 
     # Opportunistically upgrade a hash made with older argon2 parameters.
@@ -71,8 +75,13 @@ def read_current_admin(admin: CurrentAdmin) -> AdminProfile:
 
 @router.post("/password", response_model=Message)
 def change_password(payload: PasswordChangeRequest, admin: CurrentAdmin, db: DbSession) -> Message:
+    # A 422 rather than a 401: the session itself is valid, and the client
+    # treats any 401 as an expired session and signs the admin out.
     if not verify_password(payload.current_password, admin.password_hash):
-        raise AuthError("Current password is incorrect")
+        raise FieldError(
+            "Your current password is incorrect.",
+            {"current_password": "This is not your current password."},
+        )
 
     admin.password_hash = hash_password(payload.new_password)
     # Retire every token issued before this change, including the one used to
