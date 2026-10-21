@@ -11,6 +11,7 @@
 
 import { Link } from 'react-router-dom';
 import { cn } from '@/utils/cn';
+import { useDarkHero } from '@/hooks/useHeaderTone';
 import { cx } from '@/utils/format';
 import { ArrowRightIcon } from './Icons';
 import { Reveal } from './Reveal';
@@ -200,6 +201,8 @@ export function PageHeader({
   watermark?: string;
   children?: ReactNode;
 }) {
+  useDarkHero();
+
   return (
     <header className="grid-board grain relative overflow-clip bg-board pt-[calc(var(--header-height)+3rem)] pb-20 text-on-contrast md:pb-28">
       <div

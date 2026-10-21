@@ -169,6 +169,16 @@ def test_plain_text_drops_code_blocks_and_images():
     assert "Prose." in text
 
 
+def test_plain_text_drops_raw_html_and_script_contents():
+    text = plain_text(
+        "About apples. <script>alert(1)</script> <b>Bold</b> &amp; [link](https://x.y)"
+    )
+
+    assert "<" not in text
+    assert "alert" not in text
+    assert text == "About apples. Bold & link"
+
+
 def test_a_short_body_is_its_own_excerpt():
     assert build_excerpt("Short enough.") == "Short enough."
 
@@ -217,6 +227,35 @@ def test_a_valid_png_is_stored():
     assert stored.url.endswith(".png")
     assert stored.path.is_file()
     assert (stored.width, stored.height) == (64, 64)
+
+
+def _photo_with_exif(orientation: int = 1) -> bytes:
+    image = Image.new("RGB", (40, 20), (200, 30, 30))
+    exif = Image.Exif()
+    exif[0x0110] = "Secret Phone Model"  # Model
+    exif[0x0112] = orientation  # Orientation
+    buffer = io.BytesIO()
+    image.save(buffer, "JPEG", exif=exif.tobytes())
+    return buffer.getvalue()
+
+
+def test_exif_metadata_is_not_stored():
+    stored = save_image(content=_photo_with_exif(), content_type="image/jpeg", filename="p.jpg")
+
+    with Image.open(stored.path) as image:
+        assert not image.getexif()
+    assert b"Secret Phone Model" not in stored.path.read_bytes()
+
+
+def test_a_rotated_photo_is_stored_upright():
+    # Orientation 6 means "rotate 90 degrees clockwise to display".
+    stored = save_image(
+        content=_photo_with_exif(orientation=6), content_type="image/jpeg", filename="p.jpg"
+    )
+
+    assert (stored.width, stored.height) == (20, 40)
+    with Image.open(stored.path) as image:
+        assert image.size == (20, 40)
 
 
 def test_the_stored_name_does_not_come_from_the_client():
@@ -319,3 +358,21 @@ def test_a_roster_term_gives_the_year_the_session_ends(term, expected):
 def test_an_unreadable_term_gives_no_year(term):
     # An empty field the branch can fill in beats a year we made up.
     assert graduation_year_from_term(term) is None
+
+
+# ---------------------------------------------------------------------------
+# Email
+# ---------------------------------------------------------------------------
+
+
+def test_a_line_break_in_the_subject_cannot_break_the_message():
+    from app.core.config import Settings
+    from app.services.email import _build_message
+
+    cfg = Settings(email_backend="smtp", smtp_host="localhost")
+    message = _build_message(
+        to="admin@example.com", subject="Hi from Bob\r\nBcc: x@example.com", body="x", cfg=cfg
+    )
+
+    assert message["Subject"] == "Hi from Bob Bcc: x@example.com"
+    assert message["Bcc"] is None

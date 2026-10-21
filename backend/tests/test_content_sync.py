@@ -22,6 +22,7 @@ from app.models.content import (
     TeamCategory,
     TeamMember,
 )
+from app.services.blogs import to_summary
 
 
 @pytest.fixture
@@ -155,12 +156,15 @@ def test_a_post_is_linked_to_its_category_and_tags(db: Session, content_dir: Pat
     assert article.published_at == date(2026, 2, 1)
 
 
-def test_excerpt_and_reading_time_are_derived(db: Session, content_dir: Path):
+def test_reading_time_is_derived_and_a_missing_excerpt_is_not_stored(
+    db: Session, content_dir: Path
+):
     ContentSync(db, content_dir).import_all()
 
     article = db.scalar(select(BlogPost).where(BlogPost.slug == "an-article"))
 
-    assert article.excerpt
+    assert article.excerpt is None
+    assert to_summary(article).excerpt
     assert article.reading_minutes >= 1
 
 

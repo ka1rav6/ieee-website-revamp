@@ -240,6 +240,17 @@ function AlumnusEditor({
                 />
               )}
             </Labelled>
+            <Labelled label="Website" optional error={fieldErrors.website_url}>
+              {(props) => (
+                <input
+                  {...props}
+                  type="url"
+                  placeholder="https://…"
+                  value={values.website_url ?? ''}
+                  onChange={(e) => update('website_url', e.target.value)}
+                />
+              )}
+            </Labelled>
           </div>
         </fieldset>
 
@@ -327,7 +338,7 @@ export default function AdminAlumniPage() {
           {data.map((alumnus, index) => (
             <li
               key={alumnus.id}
-              className="flex items-center gap-3 p-3 transition-colors hover:bg-[var(--surface-sunken)]"
+              className="flex flex-wrap items-center gap-3 p-3 transition-colors hover:bg-[var(--surface-sunken)] sm:flex-nowrap"
             >
               <ReorderControls
                 label={alumnus.name}
@@ -357,7 +368,7 @@ export default function AdminAlumniPage() {
                 {alumnus.graduation_year ?? '—'}
               </span>
 
-              <div className="flex shrink-0 items-center gap-1">
+              <div className="flex w-full shrink-0 items-center justify-end gap-1 sm:w-auto">
                 <button
                   type="button"
                   onClick={() => setEditing(alumnus)}

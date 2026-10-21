@@ -585,7 +585,7 @@ def test_only_one_ieee_day_edition_stays_current(client, auth_headers):
 def test_a_mismatched_year_is_refused(client, auth_headers):
     response = client.put("/api/v1/admin/ieee-day/2026", headers=auth_headers, json={"year": 2025})
 
-    assert response.status_code == 404
+    assert response.status_code == 422
 
 
 def test_an_unknown_ieee_day_year_returns_404(client):
@@ -705,3 +705,193 @@ def test_an_over_long_setting_key_is_rejected(client, auth_headers):
 
     assert response.status_code == 422
     assert "values" in response.json()["fields"]
+
+
+# ---------------------------------------------------------------------------
+# Publication dates and excerpts
+# ---------------------------------------------------------------------------
+
+
+def test_publishing_from_the_editor_dates_the_post(client, auth_headers):
+    from datetime import date
+
+    response = client.post(
+        "/api/v1/admin/blogs",
+        headers=auth_headers,
+        json={"title": "Live at once", "author_name": "A", "body": "Hello", "is_published": True},
+    )
+
+    assert response.json()["published_at"] == date.today().isoformat()
+
+
+def test_publishing_a_draft_through_an_edit_dates_it(client, auth_headers, db: Session):
+    from datetime import date
+
+    draft = make_post(db, slug="draft", published=False, published_at=None)
+
+    response = client.patch(
+        f"/api/v1/admin/blogs/{draft.id}", headers=auth_headers, json={"is_published": True}
+    )
+
+    assert response.json()["published_at"] == date.today().isoformat()
+
+
+def test_a_chosen_publication_date_is_kept(client, auth_headers):
+    response = client.post(
+        "/api/v1/admin/blogs",
+        headers=auth_headers,
+        json={
+            "title": "Backdated",
+            "author_name": "A",
+            "is_published": True,
+            "published_at": "2024-03-01",
+        },
+    )
+
+    assert response.json()["published_at"] == "2024-03-01"
+
+
+def test_a_derived_excerpt_is_not_stored_and_follows_the_body(client, auth_headers):
+    created = client.post(
+        "/api/v1/admin/blogs",
+        headers=auth_headers,
+        json={
+            "title": "Fruit",
+            "author_name": "A",
+            "body": "All about apples.",
+            "is_published": True,
+        },
+    ).json()
+    assert created["excerpt"] is None
+
+    client.patch(
+        f"/api/v1/admin/blogs/{created['id']}",
+        headers=auth_headers,
+        json={"body": "All about oranges."},
+    )
+
+    public = client.get(f"/api/v1/blogs/{created['slug']}").json()
+    assert public["excerpt"] == "All about oranges."
+
+
+def test_an_authored_excerpt_wins_over_the_body(client, auth_headers):
+    created = client.post(
+        "/api/v1/admin/blogs",
+        headers=auth_headers,
+        json={
+            "title": "Summarised",
+            "author_name": "A",
+            "body": "The long body.",
+            "excerpt": "A hand-written summary.",
+            "is_published": True,
+        },
+    ).json()
+
+    assert client.get(f"/api/v1/blogs/{created['slug']}").json()["excerpt"] == (
+        "A hand-written summary."
+    )
+
+
+# ---------------------------------------------------------------------------
+# Validation edges
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    ("factory", "endpoint", "field"),
+    [
+        (make_post, "/api/v1/admin/blogs/{id}", "title"),
+        (make_post, "/api/v1/admin/blogs/{id}", "is_published"),
+        (make_member, "/api/v1/admin/team/{id}", "name"),
+        (make_alumnus, "/api/v1/admin/alumni/{id}", "name"),
+        (make_collaboration, "/api/v1/admin/collaborations/{id}", "name"),
+        (make_event, "/api/v1/admin/events/{id}", "title"),
+    ],
+)
+def test_an_explicit_null_for_a_required_field_is_a_422(
+    client, auth_headers, db: Session, factory, endpoint, field
+):
+    record = factory(db)
+
+    response = client.patch(endpoint.format(id=record.id), headers=auth_headers, json={field: None})
+
+    assert response.status_code == 422
+    assert response.json()["fields"][field] == "This field cannot be empty."
+
+
+def test_an_explicit_null_for_an_optional_field_clears_it(client, auth_headers, db: Session):
+    member = make_member(db, slug="has-bio", bio="A bio.")
+
+    response = client.patch(
+        f"/api/v1/admin/team/{member.id}", headers=auth_headers, json={"bio": None}
+    )
+
+    assert response.status_code == 200
+    assert response.json()["bio"] is None
+
+
+def test_reordering_with_a_repeated_id_is_refused(client, auth_headers, db: Session):
+    member = make_member(db, slug="twice")
+
+    response = client.post(
+        "/api/v1/admin/team/reorder", headers=auth_headers, json={"ids": [member.id, member.id]}
+    )
+
+    assert response.status_code == 422
+
+
+def test_validation_messages_are_written_for_people(client, auth_headers):
+    response = client.post(
+        "/api/v1/admin/team",
+        headers=auth_headers,
+        json={"name": "", "category": "core", "email": "not-an-email", "website_url": "nope"},
+    )
+
+    fields = response.json()["fields"]
+    assert fields["name"] == "This field is required."
+    assert fields["email"] == "Enter a valid email address, like name@example.com."
+    assert fields["website_url"] == "Enter a full web address, starting with https://."
+
+
+# ---------------------------------------------------------------------------
+# Ordering of new records
+# ---------------------------------------------------------------------------
+
+
+def test_a_new_member_joins_the_end_of_their_category(client, auth_headers, db: Session):
+    make_member(db, slug="chair", name="Chair", sort_order=0)
+    make_member(db, slug="vice", name="Vice", sort_order=1)
+    make_member(db, slug="elsewhere", category=TeamCategory.EXECUTIVE, sort_order=7)
+
+    response = client.post(
+        "/api/v1/admin/team", headers=auth_headers, json={"name": "Newest", "category": "core"}
+    )
+
+    assert response.json()["sort_order"] == 2
+    core = client.get("/api/v1/team", params={"category": "core"}).json()
+    assert [m["name"] for m in core][-1] == "Newest"
+
+
+def test_a_requested_position_is_respected(client, auth_headers, db: Session):
+    make_member(db, slug="chair", sort_order=5)
+
+    response = client.post(
+        "/api/v1/admin/team",
+        headers=auth_headers,
+        json={"name": "Pinned", "category": "core", "sort_order": 0},
+    )
+
+    assert response.json()["sort_order"] == 0
+
+
+def test_new_alumni_and_collaborations_are_appended(client, auth_headers, db: Session):
+    make_alumnus(db)
+    make_collaboration(db)
+
+    alumnus = client.post("/api/v1/admin/alumni", headers=auth_headers, json={"name": "Later"})
+    partner = client.post(
+        "/api/v1/admin/collaborations", headers=auth_headers, json={"name": "Partner"}
+    )
+
+    assert alumnus.json()["sort_order"] == 1
+    assert partner.json()["sort_order"] == 1

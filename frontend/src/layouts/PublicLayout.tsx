@@ -6,12 +6,13 @@
  * rather than a flash.
  */
 
-import { useEffect } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
 import { BackToTop } from '@/components/ui/Interactive';
+import { HeaderToneContext } from '@/hooks/useHeaderTone';
 
 /**
  * Jump to the top on navigation, but leave in-page anchors alone so a link
@@ -37,32 +38,41 @@ export function PublicLayout() {
   const reducedMotion = useReducedMotion();
   useScrollRestoration();
 
+  const [darkHeroes, setDarkHeroes] = useState(0);
+  const register = useCallback(() => {
+    setDarkHeroes((count) => count + 1);
+    return () => setDarkHeroes((count) => count - 1);
+  }, []);
+  const headerTone = useMemo(() => ({ darkHeroes, register }), [darkHeroes, register]);
+
   return (
-    <div className="flex min-h-dvh flex-col">
-      <Header />
+    <HeaderToneContext.Provider value={headerTone}>
+      <div className="flex min-h-dvh flex-col">
+        <Header />
 
-      <main id="main" className="flex flex-1 flex-col">
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={location.pathname}
-            className="flex flex-1 flex-col"
-            initial={reducedMotion ? undefined : { opacity: 0, y: 8 }}
-            animate={reducedMotion ? undefined : { opacity: 1, y: 0 }}
-            exit={reducedMotion ? undefined : { opacity: 0, y: -8 }}
-            // Deliberately brief: a page transition that makes the visitor
-            // wait is worse than none at all.
-            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <Outlet />
-          </motion.div>
-        </AnimatePresence>
-      </main>
+        <main id="main" className="flex flex-1 flex-col">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={location.pathname}
+              className="flex flex-1 flex-col"
+              initial={reducedMotion ? undefined : { opacity: 0, y: 8 }}
+              animate={reducedMotion ? undefined : { opacity: 1, y: 0 }}
+              exit={reducedMotion ? undefined : { opacity: 0, y: -8 }}
+              // Deliberately brief: a page transition that makes the visitor
+              // wait is worse than none at all.
+              transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <Outlet />
+            </motion.div>
+          </AnimatePresence>
+        </main>
 
-      <Footer />
+        <Footer />
 
-      {/* In the frame rather than on each page, so it is present on every
+        {/* In the frame rather than on each page, so it is present on every
           route without nine copies of the same button. */}
-      <BackToTop />
-    </div>
+        <BackToTop />
+      </div>
+    </HeaderToneContext.Provider>
   );
 }

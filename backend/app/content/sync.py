@@ -57,7 +57,7 @@ from app.models.content import (
     SiteSetting,
     TeamMember,
 )
-from app.services.text import build_excerpt, reading_minutes, slugify
+from app.services.text import reading_minutes, slugify
 
 
 @dataclass
@@ -354,7 +354,10 @@ class ContentSync:
             values = {
                 "title": item.title,
                 "body": body,
-                "excerpt": item.excerpt or build_excerpt(body),
+                # Only an authored excerpt is stored; a derived one is worked
+                # out when the post is read, so it never goes stale and never
+                # gets written back into the file on export.
+                "excerpt": item.excerpt,
                 "cover_image": item.cover_image,
                 "cover_image_alt": item.cover_image_alt,
                 "author_name": item.author,
@@ -688,7 +691,11 @@ class ContentSync:
             values,
             header=_header(
                 "Editable site copy and links.\n"
-                "Also editable in the admin dashboard under Settings.",
+                "Also editable in the admin dashboard under Settings.\n"
+                "`hero_heading` takes two bits of markup: a line break breaks the line,\n"
+                "and *asterisks* around a word give it the halftone-dot treatment.\n"
+                "`hero_meta` and `hero_status` are hidden while empty.\n"
+                'Perks: one per line, as "Short title | the sentence under it".',
                 "settings",
             ),
         )
@@ -704,7 +711,11 @@ class ContentSync:
                 _compact({"name": c.name, "slug": c.slug, "description": c.description})
                 for c in rows
             ],
-            header=_header("Blog categories. List order is display order.", "blogs"),
+            header=_header(
+                "Blog categories. List order is display order on /blogs.\n"
+                "A post's `category:` must match one of these slugs.",
+                "blogs",
+            ),
         )
         report.record("blog category", "updated")
 
@@ -720,7 +731,9 @@ class ContentSync:
                     "author_subtitle": post.author_subtitle,
                     "author_image": post.author_image,
                     "category": post.category.slug if post.category else None,
-                    "tags": [tag.name for tag in post.tags],
+                    # Tags are an unordered set in the database, so they are
+                    # written sorted to keep repeated exports byte-identical.
+                    "tags": sorted(tag.name for tag in post.tags),
                     "date": post.published_at,
                     "excerpt": post.excerpt,
                     "cover_image": post.cover_image,
@@ -807,7 +820,11 @@ class ContentSync:
                 )
                 for a in alumni
             ],
-            header=_header("Alumni. Only publicly shareable details belong here.", "alumni"),
+            header=_header(
+                "Alumni. Only publicly shareable details belong here.\n"
+                "Graduation years are blank where the previous site did not record them.",
+                "alumni",
+            ),
         )
         for _ in alumni:
             report.record("alumnus", "updated")
@@ -834,7 +851,10 @@ class ContentSync:
                 for c in rows
             ],
             header=_header(
-                "Industry collaborations. List order is display order.", "collaborations"
+                "Industry collaborations. List order is display order.\n"
+                "Optional per entry: `collaboration_type` (Sponsor, Workshop partner,\n"
+                "Speaker, Prize partner) and `year` - the previous site never recorded them.",
+                "collaborations",
             ),
         )
         for _ in rows:
@@ -864,7 +884,12 @@ class ContentSync:
                 )
                 for e in events
             ],
-            header=_header("Events, newest first. Dates are YYYY-MM-DD.", "events"),
+            header=_header(
+                "Events, newest first. Dates are YYYY-MM-DD.\n"
+                "`is_featured: true` surfaces an event on the landing page;\n"
+                "`ieee_day_year: 2026` lists it under that IEEE Day edition.",
+                "events",
+            ),
         )
         for _ in events:
             report.record("event", "updated")
@@ -905,7 +930,12 @@ class ContentSync:
                 )
                 for e in editions
             ],
-            header=_header("IEEE Day editions, newest first.", "ieee-day"),
+            header=_header(
+                "IEEE Day editions, newest first.\n"
+                "`stats`, `highlights` and `gallery` are optional; the page omits any\n"
+                "section with no content, so a partial entry still looks intentional.",
+                "ieee-day",
+            ),
         )
         for _ in editions:
             report.record("ieee day", "updated")

@@ -72,6 +72,16 @@ def test_a_database_url_makes_the_postgres_password_irrelevant():
     assert not any("POSTGRES_PASSWORD" in problem for problem in problems)
 
 
+
+def test_the_default_password_inside_a_database_url_is_flagged():
+    problems = check_production_config(
+        _production(
+            database_url="postgresql+psycopg://ieee:ieee-local-dev-password@db:5432/ieee",
+        )
+    )
+
+    assert any("POSTGRES_PASSWORD" in problem for problem in problems)
+
 def test_smtp_without_a_host_is_flagged():
     problems = check_production_config(_production(email_backend="smtp", smtp_host=""))
 

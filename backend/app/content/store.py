@@ -132,8 +132,9 @@ class _Dumper(yaml.SafeDumper):
 
 
 _Dumper.add_representer(str, _represent_str)
+# As a YAML date (unquoted), which is how the files are written by hand.
 _Dumper.add_representer(
-    date, lambda d, v: d.represent_scalar("tag:yaml.org,2002:str", v.isoformat())
+    date, lambda d, v: d.represent_scalar("tag:yaml.org,2002:timestamp", v.isoformat())
 )
 
 
@@ -154,7 +155,9 @@ def write_yaml(path: Path, data: Any, *, header: str | None = None) -> None:
     if header:
         commented = "\n".join(f"# {line}".rstrip() for line in header.strip().split("\n"))
         body = f"{commented}\n\n{body}"
-    path.write_text(body, encoding="utf-8")
+    # Always LF, so an export on Windows does not rewrite every line ending
+    # (the repository checks text out with eol=lf).
+    path.write_text(body, encoding="utf-8", newline="\n")
 
 
 def write_markdown(path: Path, meta: dict[str, Any], body: str) -> None:
@@ -163,4 +166,4 @@ def write_markdown(path: Path, meta: dict[str, Any], body: str) -> None:
     # Drop empty optional fields so exported files stay readable.
     trimmed = {k: v for k, v in meta.items() if v not in (None, "", [], {})}
     content = f"{FRONTMATTER_FENCE}\n{dump_yaml(trimmed)}{FRONTMATTER_FENCE}\n\n{body.strip()}\n"
-    path.write_text(content, encoding="utf-8")
+    path.write_text(content, encoding="utf-8", newline="\n")

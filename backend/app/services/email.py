@@ -21,11 +21,21 @@ class EmailDeliveryError(Exception):
     """Raised by a backend that could not hand the message off."""
 
 
+def _single_line(value: str) -> str:
+    """Collapse whitespace, line breaks included, into single spaces.
+
+    The subject carries a visitor's name and subject line. Python's email
+    package refuses a header containing CR or LF (header injection), so an
+    unflattened newline would make the notification fail outright.
+    """
+    return " ".join(value.split())
+
+
 def _build_message(*, to: str, subject: str, body: str, cfg: Settings) -> EmailMessage:
     message = EmailMessage()
     message["From"] = cfg.email_from
     message["To"] = to
-    message["Subject"] = subject
+    message["Subject"] = _single_line(subject)
     message.set_content(body)
     return message
 

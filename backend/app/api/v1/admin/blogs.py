@@ -20,7 +20,7 @@ from app.schemas.content import (
     BlogPostCreate,
     BlogPostUpdate,
 )
-from app.services.text import build_excerpt, reading_minutes, slugify
+from app.services.text import reading_minutes, slugify
 
 router = APIRouter(prefix="/blogs", tags=["admin:blogs"])
 
@@ -68,10 +68,19 @@ def _resolve_tags(db: DbSession, names: list[str]) -> list[BlogTag]:
 
 
 def _apply_derived_fields(post: BlogPost) -> None:
-    """Keep excerpt and reading time in step with the body."""
-    if not post.excerpt:
-        post.excerpt = build_excerpt(post.body)
+    """Keep reading time in step with the body, and date a published post.
+
+    The excerpt is deliberately not filled in here. A derived excerpt is
+    computed when the post is read (see services.blogs.to_summary); storing it
+    would make it indistinguishable from one the author wrote, so it would go
+    stale the first time the body changed.
+
+    Publishing from the editor dates the post the same way the publish
+    endpoint does, so an article is never live without a date.
+    """
     post.reading_minutes = reading_minutes(post.body)
+    if post.is_published and post.published_at is None:
+        post.published_at = date.today()
 
 
 # ---------------------------------------------------------------------------
@@ -254,10 +263,7 @@ def update_post(
     for field, value in data.items():
         setattr(post, field, value)
 
-    if "body" in data:
-        post.reading_minutes = reading_minutes(post.body)
-    if not post.excerpt:
-        post.excerpt = build_excerpt(post.body)
+    _apply_derived_fields(post)
 
     db.commit()
     db.refresh(post)

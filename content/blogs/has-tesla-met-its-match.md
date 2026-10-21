@@ -1,13 +1,13 @@
 ---
-title: "Has Tesla Met its Match?"
-author: "Mann Nariya"
-author_subtitle: "B.Tech."
-category: "tech-wonders"
+title: Has Tesla Met its Match?
+author: Mann Nariya
+author_subtitle: B.Tech.
+category: tech-wonders
 tags:
-  - "automotive"
-  - "autonomy"
-cover_image: "/legacy/blog/ad32f69c43.webp"
-cover_image_alt: "Has Tesla Met its Match?"
+  - automotive
+  - autonomy
+cover_image: /legacy/blog/ad32f69c43.webp
+cover_image_alt: Has Tesla Met its Match?
 published: true
 featured: false
 ---
@@ -127,5 +127,3 @@ academia connected to the club.
 [
 apply
 ](https://forms.gle/5xoKNbj6moQpRn2o9)
-
-![logo](/logowhite.png)

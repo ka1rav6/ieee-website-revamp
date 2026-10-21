@@ -201,6 +201,12 @@ rather than leaving you to check.
   typo like `positon:` is caught immediately.
 - `published: false` in a post's frontmatter keeps it a draft; drafts are
   invisible to the public API entirely, not merely unlinked.
+- A post's `excerpt:` is optional. Leave it out and the opening of the body is
+  used, worked out each time the post is served - so it follows edits to the
+  body, and an export never writes it back into the file as if you had.
+- Publishing a post from the dashboard dates it that day if it has no date
+  yet. A file's `date:` is taken as written, so a file without one stays
+  undated (an import cannot invent a date without changing it on every run).
 
 ---
 
@@ -284,15 +290,25 @@ Every variable is documented in the template; the ones that matter:
 | `POSTGRES_*` | Host, port, user, password, database |
 | `ADMIN_EMAIL`, `ADMIN_PASSWORD` | Read by `just admin`; the password is argon2-hashed and never returned by the API |
 | `UPLOAD_DIR`, `MAX_UPLOAD_SIZE_MB` | Where admin images go, and the cap |
+| `MAX_REQUEST_BODY_MB` | Largest request body accepted (default 10). Keep it above the upload cap |
 | `EMAIL_BACKEND` | `console`, `smtp` or `none` |
 | `SMTP_*`, `EMAIL_FROM`, `EMAIL_TO` | Used when the backend is `smtp` |
 | `CORS_ORIGINS` | Only needed when the frontend is served from another origin |
+| `TRUSTED_PROXIES` | IPs/CIDRs of reverse proxies allowed to set `X-Forwarded-For`. See below |
 | `VITE_API_BASE_URL` | Build-time. Leave empty for the default same-origin setup |
 
 **The application refuses to start in production** with the development
-signing key, with a key under 32 characters, with a plain `http://` site URL,
-or with `EMAIL_BACKEND=smtp` and no SMTP host. Outside production these are
-warnings.
+signing key, with a key under 32 characters, with a plain `http://` or
+localhost site URL, with the development Postgres password, with sessions
+longer than 24 hours, or with `EMAIL_BACKEND=smtp` and no SMTP host. Outside
+production these are warnings.
+
+**Behind a reverse proxy, set `TRUSTED_PROXIES`.** Sign-in and contact-form
+rate limits are keyed by client IP. `X-Forwarded-For` is attacker-controlled,
+so it is only believed when the connection comes from a listed proxy; with the
+variable empty the socket address is used. If you put nginx or Caddy in front
+of the container and leave it empty, every visitor shares the proxy's address
+and therefore one rate-limit bucket.
 
 Secrets never go in git. In CI they come from GitHub's own token; in
 production, from your host's secret store.
@@ -575,9 +591,11 @@ imported images were re-encoded to WebP at display sizes, taking 94 MB of
 originals down to 6.9 MB.
 
 **Security.** Markdown is rendered and then sanitised against an allow-list
-server-side, so post bodies are safe to inject. Uploads are validated by
-decoding the image rather than trusting its name or type, and the stored
-filename is generated, never taken from the client. SVG uploads are refused —
+server-side (with [nh3](https://github.com/messense/nh3)), so post bodies are
+safe to inject. Uploads are validated by decoding the image rather than
+trusting its name or type, and the stored filename is generated, never taken
+from the client. Still images are re-encoded without their EXIF metadata, so a
+phone photo does not publish where it was taken. SVG uploads are refused —
 an SVG is an executable document. Strict security headers including a CSP
 that needs no external host, since every asset is served from this origin.
 
@@ -597,8 +615,15 @@ Things a future maintainer should know are deliberately unfinished:
   previous site had no IEEE Day page to import from. Sections with no content
   are omitted rather than shown empty.
 - **Collaboration details.** Names, logos and links were imported; the *type*
-  of each collaboration and the year it happened were never recorded, so
-  those fields start commented out in `content/collaborations.yaml`.
+  of each collaboration and the year it happened were never recorded. Add
+  `collaboration_type` and `year` to an entry in `content/collaborations.yaml`
+  (the file's header lists them) or set them in the dashboard.
+- **Event to double-check.** "IEEE: Inauguration 2025" is dated 2024-11-05 and
+  its poster is named `ieee-inaugration-2024.webp`, so it is filed under 2024.
+  Either the title or the date is wrong; nothing here can tell which.
+- **Benefits of IEEE cover.** The cover imported for that post is a small
+  logo scaled up, and looks soft at article width. It needs a better source
+  image.
 - **Rate limiting is in-process.** Fine for a single container. Running more
   than one replica needs this moved to Redis, since each process currently
   keeps its own counters.

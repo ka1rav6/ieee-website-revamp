@@ -5,6 +5,10 @@ if all of the following hold: the declared type is on the allow-list, the
 bytes are within the size limit, and Pillow can actually decode the image.
 Verifying the content is what stops a renamed script or a malformed file from
 being stored and later served.
+
+Still images are also re-encoded without their metadata before they are
+stored. Phone photos carry EXIF - often GPS coordinates and the device - and
+every upload is served publicly.
 """
 
 from __future__ import annotations
@@ -15,7 +19,7 @@ from datetime import date
 from io import BytesIO
 from pathlib import Path
 
-from PIL import Image, UnidentifiedImageError
+from PIL import Image, ImageOps, UnidentifiedImageError
 
 from app.core.config import settings
 from app.core.errors import ValidationError
@@ -83,6 +87,11 @@ def save_image(*, content: bytes, content_type: str | None, filename: str | None
     if width * height > MAX_PIXELS:
         raise ValidationError("That image's dimensions are too large.")
 
+    try:
+        content, (width, height) = _without_metadata(content, image_format, (width, height))
+    except (OSError, ValueError) as exc:
+        raise ValidationError("That file is not a readable image.") from exc
+
     # The stored name is generated, never taken from the client, so a crafted
     # filename cannot traverse directories or overwrite an existing file.
     extension = ALLOWED_FORMATS[image_format]
@@ -101,6 +110,47 @@ def save_image(*, content: bytes, content_type: str | None, filename: str | None
         height=height,
         size_bytes=len(content),
     )
+
+
+# Encoder settings per format. JPEG and WebP are lossy, so a high quality keeps
+# the re-encode visually identical to what was uploaded.
+_SAVE_OPTIONS: dict[str, dict[str, object]] = {
+    "JPEG": {"quality": 92, "optimize": True},
+    "WEBP": {"quality": 92},
+    "PNG": {"optimize": True},
+}
+
+
+def _without_metadata(
+    content: bytes, image_format: str, size: tuple[int, int]
+) -> tuple[bytes, tuple[int, int]]:
+    """Re-encode a still image so EXIF and other metadata are dropped.
+
+    The EXIF orientation is applied to the pixels first, so a portrait photo
+    stays upright once the tag that rotated it is gone. The colour profile is
+    kept, because dropping it shifts colours. GIFs and animated images are
+    stored as uploaded: GIF carries no EXIF, and re-encoding an animation
+    would need every frame handled.
+
+    Returns the bytes to store and their dimensions, which change when the
+    orientation tag rotated the photo.
+    """
+    if image_format not in _SAVE_OPTIONS:
+        return content, size
+
+    with Image.open(BytesIO(content)) as image:
+        if getattr(image, "is_animated", False):
+            return content, size
+        icc_profile = image.info.get("icc_profile")
+        upright = ImageOps.exif_transpose(image)
+        options = dict(_SAVE_OPTIONS[image_format])
+        if icc_profile:
+            options["icc_profile"] = icc_profile
+        if image_format == "JPEG" and upright.mode not in ("RGB", "L", "CMYK"):
+            upright = upright.convert("RGB")
+        output = BytesIO()
+        upright.save(output, format=image_format, **options)
+        return output.getvalue(), upright.size
 
 
 def _slug_hint(filename: str) -> str:

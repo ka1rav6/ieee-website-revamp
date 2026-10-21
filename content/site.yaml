@@ -1,36 +1,12 @@
 # Editable site copy and links.
-#
-# Every value here is also editable in the admin dashboard under Settings,
-# so routine wording changes never need a developer.
-# After editing this file, run `just content-import`.
-
-# --- Identity -------------------------------------------------------------
-site_name: "IEEE IIIT Delhi"
-site_tagline: "Student Branch"
-
-# The headline takes two characters of markup: a line break breaks the line,
+# Also editable in the admin dashboard under Settings.
+# `hero_heading` takes two bits of markup: a line break breaks the line,
 # and *asterisks* around a word give it the halftone-dot treatment.
-hero_heading: |-
-  Technology for
-  *humanity*,
-  built by students.
-hero_subheading: >-
-  The IEEE student branch at IIIT Delhi, where the institute's biggest
-  technical events are imagined, engineered and run.
-hero_eyebrow: "IEEE Student Branch · IIIT Delhi"
+# `hero_meta` and `hero_status` are hidden while empty.
+# Perks: one per line, as "Short title | the sentence under it".
+# Edit here, then `just content-import settings`. Edit in the dashboard,
+# then `just dbsync settings` to pull it back - which rewrites this file.
 
-# Both optional, and both hidden while empty rather than falling back to
-# something plausible. `hero_meta` sits in the middle of the status line
-# above the headline; `hero_status` sits at its right with a blinking marker,
-# for something that is true right now ("Induction open", say).
-hero_meta: ""
-hero_status: ""
-
-# --- About ----------------------------------------------------------------
-about_short: >-
-  IEEE-IIITD is the student branch of the world's largest technical
-  professional organisation dedicated to advancing technology to benefit
-  humanity.
 about_body: |
   IEEE-IIITD is the student branch of the world's largest technical
   professional organisation dedicated to advancing technology to benefit
@@ -52,66 +28,46 @@ about_body: |
   With one of the biggest and most diverse teams of all the clubs and a
   roster of unique events and workshops, IEEE-IIITD is one of the best places
   to be to hone your skills and have fun while at it.
-
-# --- Membership -----------------------------------------------------------
-join_url: "https://forms.gle/5xoKNbj6moQpRn2o9"
+about_short: IEEE-IIITD is the student branch of the world's largest technical professional organisation
+  dedicated to advancing technology to benefit humanity.
+branding_url: https://github.com/IEEE-IIIT-Delhi/branding
+compsoc_url: https://www.computer.org/
+contact_address: IIIT Delhi, Okhla Industrial Estate, Phase III, New Delhi 110020
+contact_body: Whether you are a student with a question or an organisation looking to collaborate, this
+  reaches the branch directly.
+contact_email: ieee@iiitd.ac.in
+contact_heading: Let's build something together.
+facebook_url: https://www.facebook.com/ieeeiiitd/
+faqs: ''
+hero_eyebrow: IEEE Student Branch · IIIT Delhi
+hero_heading: |-
+  Technology for
+  *humanity*,
+  built by students.
+hero_meta: ''
+hero_status: ''
+hero_subheading: The IEEE student branch at IIIT Delhi, where the institute's biggest technical events
+  are imagined, engineered and run.
+ieee_url: https://www.ieee.org/
+instagram_url: https://www.instagram.com/ieeeiiitdelhi/
+institute_url: https://iiitd.ac.in/
+join_body: Membership runs through the IEEE student branch form. It takes a couple of minutes, and the
+  branch follows up over email.
 join_heading: |-
   Become part of
   the *community.*
-join_body: >-
-  Membership runs through the IEEE student branch form. It takes a couple of
-  minutes, and the branch follows up over email.
-
-# One perk per line, as "Short title | the sentence under it". A line with no
-# pipe is treated as a title on its own.
 join_perks: |
   IEEE scholarships and grants | Eligibility for IEEE scholarships, grants and awards.
   Faculty across departments | Direct access to faculty members across every department.
   Industry and academia | Conversations with distinguished people from industry and academia.
   The institute's flagship events | Ownership of the biggest technical events IIIT Delhi runs.
-
-# --- Contact --------------------------------------------------------------
-contact_email: "ieee@iiitd.ac.in"
-contact_address: "IIIT Delhi, Okhla Industrial Estate, Phase III, New Delhi 110020"
-contact_heading: "Let's build something together."
-contact_body: >-
-  Whether you are a student with a question or an organisation looking to
-  collaborate, this reaches the branch directly.
-
-# --- Social ---------------------------------------------------------------
-instagram_url: "https://www.instagram.com/ieeeiiitdelhi/"
-facebook_url: "https://www.facebook.com/ieeeiiitd/"
-linkedin_url: "https://www.linkedin.com/company/ieee-iiitd/"
-youtube_url: "https://www.youtube.com/channel/UCKqQYeZ_yOSWL0BQ7eWUqRA"
-twitter_url: "https://twitter.com/ieee_d/"
-branding_url: "https://github.com/IEEE-IIIT-Delhi/branding"
-
-# --- Affiliations ---------------------------------------------------------
-institute_url: "https://iiitd.ac.in/"
-ieee_url: "https://www.ieee.org/"
-wie_url: "https://www.wie.ieee.org/"
-compsoc_url: "https://www.computer.org/"
-
-# --- Testimonials ---------------------------------------------------------
-# One per line, as "The quote | Name | Role". Split from the right, so the
-# quote itself may contain a pipe. A line missing a name or a role is
-# skipped, and the whole section is hidden while this is empty - which is
-# why it ships empty rather than carrying invented quotes.
-#
-# For example:
-#   I came for the free pizza and stayed for the soldering iron. | A. Member | ECE, Robotics
-testimonials: ""
-
-# --- FAQ ------------------------------------------------------------------
-# One per line, as "The question? | the answer". Split on the first pipe
-# only, so the answer may contain pipes. Hidden while empty.
-#
-# For example:
-#   Do I need to be in ECE? | No. Members come from every programme.
-faqs: ""
-
-# --- SEO ------------------------------------------------------------------
-meta_description: >-
-  The IEEE student branch at IIIT Delhi. Technical events, workshops, talks
-  and competitions run by students, in affiliation with IEEE, Women in
-  Engineering and the IEEE Computer Society.
+join_url: https://forms.gle/5xoKNbj6moQpRn2o9
+linkedin_url: https://www.linkedin.com/company/ieee-iiitd/
+meta_description: The IEEE student branch at IIIT Delhi. Technical events, workshops, talks and competitions
+  run by students, in affiliation with IEEE, Women in Engineering and the IEEE Computer Society.
+site_name: IEEE IIIT Delhi
+site_tagline: Student Branch
+testimonials: ''
+twitter_url: https://twitter.com/ieee_d/
+wie_url: https://www.wie.ieee.org/
+youtube_url: https://www.youtube.com/channel/UCKqQYeZ_yOSWL0BQ7eWUqRA

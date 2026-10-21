@@ -107,6 +107,13 @@ jobs:
       - name: Verify migrations apply to an empty database
         run: uv run alembic upgrade head
 
+      - name: Verify migrations roll back and re-apply
+        # A downgrade that leaves objects behind (Postgres enum types, say)
+        # only shows up on the next upgrade, so do both.
+        run: |
+          uv run alembic downgrade base
+          uv run alembic upgrade head
+
       - name: Verify models and migrations agree
         # An empty autogenerate diff proves no model change was committed
         # without its migration. Alembic names the file from the message and

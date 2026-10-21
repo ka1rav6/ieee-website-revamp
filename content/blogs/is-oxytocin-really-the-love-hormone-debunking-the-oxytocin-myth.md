@@ -1,12 +1,12 @@
 ---
-title: "Is Oxytocin Really the 'Love Hormone’? Debunking the Oxytocin Myth"
-author: "Nishi Ninawat"
-author_subtitle: "B.Tech."
-category: "compbiopsychel"
+title: Is Oxytocin Really the 'Love Hormone’? Debunking the Oxytocin Myth
+author: Nishi Ninawat
+author_subtitle: B.Tech.
+category: compbiopsychel
 tags:
-  - "neuroscience"
-cover_image: "/legacy/blog/79570c2812.webp"
-cover_image_alt: "Is Oxytocin Really the 'Love Hormone’? Debunking the Oxytocin Myth"
+  - neuroscience
+cover_image: /legacy/blog/79570c2812.webp
+cover_image_alt: Is Oxytocin Really the 'Love Hormone’? Debunking the Oxytocin Myth
 published: true
 featured: false
 ---
@@ -65,5 +65,3 @@ academia connected to the club.
 [
 apply
 ](https://forms.gle/5xoKNbj6moQpRn2o9)
-
-![logo](/logowhite.png)

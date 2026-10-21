@@ -1,14 +1,14 @@
 ---
-title: "An Introduction to Web3"
-author: "Sameer Gupta"
-author_subtitle: "B.Tech."
-category: "tech-affairs"
+title: An Introduction to Web3
+author: Sameer Gupta
+author_subtitle: B.Tech.
+category: tech-affairs
 tags:
-  - "web3"
-  - "blockchain"
+  - blockchain
+  - web3
 date: 2022-08-23
-cover_image: "/legacy/blog/981733b0fc.webp"
-cover_image_alt: "An Introduction to Web3"
+cover_image: /legacy/blog/981733b0fc.webp
+cover_image_alt: An Introduction to Web3
 published: true
 featured: false
 ---
@@ -66,5 +66,3 @@ academia connected to the club.
 [
 apply
 ](https://forms.gle/5xoKNbj6moQpRn2o9)
-
-![logo](/logowhite.png)

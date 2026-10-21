@@ -10,12 +10,13 @@ from __future__ import annotations
 import logging
 import sys
 from contextlib import asynccontextmanager
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
+from sqlalchemy.engine import make_url
 from starlette.requests import Request
 from starlette.responses import Response
 
@@ -45,6 +46,17 @@ Everything under `/admin` requires the administrator's bearer token.
 """
 
 
+def _uses_default_database_password(cfg: Settings) -> bool:
+    """Whether the database is reached with the development password.
+
+    DATABASE_URL overrides the POSTGRES_* parts, so it is the URL's password
+    that matters when one is set.
+    """
+    if cfg.database_url:
+        return make_url(cfg.sqlalchemy_url).password == INSECURE_DEFAULT_POSTGRES_PASSWORD
+    return cfg.postgres_password == INSECURE_DEFAULT_POSTGRES_PASSWORD
+
+
 def check_production_config(cfg: Settings) -> list[str]:
     """Configuration mistakes that must not reach production.
 
@@ -65,6 +77,7 @@ def check_production_config(cfg: Settings) -> list[str]:
             problems.append("SITE_URL still points at localhost. Set the public https URL.")
         elif cfg.site_url.startswith("http://"):
             problems.append("SITE_URL should use https:// in production.")
+
         if cfg.database_url is None and cfg.postgres_password == INSECURE_DEFAULT_POSTGRES_PASSWORD:
             problems.append("POSTGRES_PASSWORD is still the development default.")
         if cfg.access_token_expire_minutes > 1440:
@@ -168,7 +181,9 @@ def _mount_frontend(app: FastAPI) -> None:
         name="assets",
     )
 
-    @app.get("/{full_path:path}", include_in_schema=False)
+    # HEAD as well as GET: uptime monitors and link checkers commonly probe
+    # with HEAD, and a 405 there reads as the site being down.
+    @app.api_route("/{full_path:path}", methods=["GET", "HEAD"], include_in_schema=False)
     async def serve_spa(request: Request, full_path: str) -> Response:
         # An unknown /api path is a client error, not a page.
         if full_path.startswith(("api/", "uploads/")):
@@ -177,6 +192,13 @@ def _mount_frontend(app: FastAPI) -> None:
         candidate = (static_dir / full_path).resolve()
         if full_path and candidate.is_file() and candidate.is_relative_to(static_dir.resolve()):
             return FileResponse(candidate)
+
+        # Client-side routes never contain a file extension (slugs are
+        # [a-z0-9-]), so a missing "/logo.png" is a missing file. Answering it
+        # with the HTML shell would hand an <img> a 200 it cannot render and
+        # hide broken links from checkers.
+        if PurePosixPath(full_path).suffix:
+            return JSONResponse({"detail": "Not found"}, status_code=404)
 
         del request
         return FileResponse(index_file, headers={"Cache-Control": "no-cache, must-revalidate"})

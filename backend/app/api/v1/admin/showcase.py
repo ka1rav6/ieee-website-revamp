@@ -7,13 +7,14 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import selectinload
 
 from app.api.v1.admin._crud import (
+    append_position,
     apply_order,
     assign_slug,
     get_or_404,
     payload_to_columns,
 )
 from app.core.deps import CurrentAdmin, DbSession
-from app.core.errors import NotFoundError
+from app.core.errors import NotFoundError, ValidationError
 from app.models.content import (
     Collaboration,
     Event,
@@ -67,6 +68,9 @@ def create_collaboration(
     collaboration.slug = assign_slug(
         db, Collaboration, requested=requested_slug, fallback=payload.name, max_length=160
     )
+    position = append_position(db, Collaboration, payload)
+    if position is not None:
+        collaboration.sort_order = position
     db.add(collaboration)
     db.commit()
     db.refresh(collaboration)
@@ -285,7 +289,7 @@ def upsert_edition(
     """Create or replace one IEEE Day edition."""
     del admin
     if payload.year != year:
-        raise NotFoundError("The year in the URL and the payload must match.")
+        raise ValidationError("The year in the URL and the payload must match.")
 
     edition = db.scalar(_edition_query().where(IeeeDayEdition.year == year))
     if edition is None:

@@ -580,7 +580,11 @@
      page, and stops the moment scrolling stops. Where it is not supported
      there is simply a static hairline - nothing animated on a timer,
      because eight dividers each running their own loop would be noise for
-     no information. */
+     no information.
+
+     The pulse is also left out entirely under reduced motion. The global
+     override below shortens animation *durations*, which a scroll-driven
+     animation ignores - it would keep moving with the scroll. */
 
   .trace-rule {
     position: relative;
@@ -597,16 +601,18 @@
   }
 
   @supports (animation-timeline: view()) {
-    .trace-rule::after {
-      content: '';
-      position: absolute;
-      inset-block: 0;
-      left: 0;
-      width: 18%;
-      background: linear-gradient(to right, transparent, var(--accent-bright), transparent);
-      animation: signal-sweep linear both;
-      animation-timeline: view();
-      animation-range: entry 10% cover 70%;
+    @media (prefers-reduced-motion: no-preference) {
+      .trace-rule::after {
+        content: '';
+        position: absolute;
+        inset-block: 0;
+        left: 0;
+        width: 18%;
+        background: linear-gradient(to right, transparent, var(--accent-bright), transparent);
+        animation: signal-sweep linear both;
+        animation-timeline: view();
+        animation-range: entry 10% cover 70%;
+      }
     }
   }
 
@@ -712,15 +718,21 @@
    requires `color: transparent` on this very element, and `currentColor`
    resolves against that same declaration - so the gradient would be
    transparent and the word would simply disappear. Hence an explicit token,
-   overridable per band through `--noise-ink`. */
+   overridable per band through `--noise-ink`.
+
+   The screen is sized from the type (`em`) rather than fixed. A fixed 7px
+   cell left only a dot or two across each stroke at phone sizes, and the
+   word broke up into specks; scaled, every size gets the same number of dots
+   per stroke. The dots cover about half the cell, enough to read as letters
+   first and texture second. */
 .noise-text {
   color: transparent;
   background-image: radial-gradient(
-    circle,
-    var(--noise-ink, var(--text-primary)) 2px,
-    transparent 2.6px
+    circle closest-side,
+    var(--noise-ink, var(--text-primary)) 72%,
+    transparent 88%
   );
-  background-size: 7px 7px;
+  background-size: clamp(3px, 0.055em, 7px) clamp(3px, 0.055em, 7px);
   -webkit-background-clip: text;
   background-clip: text;
   animation: jitter 0.45s steps(1) infinite;

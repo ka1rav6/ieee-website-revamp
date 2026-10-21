@@ -8,6 +8,7 @@ invalidate every token already issued.
 
 from __future__ import annotations
 
+import functools
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
@@ -40,6 +41,21 @@ def verify_password(password: str, password_hash: str) -> bool:
         return _hasher.verify(password_hash, password)
     except (VerifyMismatchError, VerificationError, InvalidHashError):
         return False
+
+
+@functools.cache
+def _dummy_hash() -> str:
+    return _hasher.hash("never-a-real-password")
+
+
+def burn_verification_time(password: str) -> None:
+    """Spend as long as a real verification would, for an unknown account.
+
+    Without this a sign-in for an address that is not the admin's returns
+    before any hashing happens, and the response time alone would reveal
+    which address is the real one.
+    """
+    verify_password(password, _dummy_hash())
 
 
 def needs_rehash(password_hash: str) -> bool:
